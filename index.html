@@ -3716,7 +3716,15 @@
     }
     function normalizeGroup(g){ return {...g, cloudId:g.cloudId || null}; }
     async function syncFromCloud(){
-      if(!user || syncing) return; syncing=true;
+      if(syncing) return;
+      // Refresh the authenticated identity from Supabase before any RLS-protected request.
+      initClient();
+      const authResult = await client.auth.getUser();
+      if(authResult.error) throw authResult.error;
+      user = authResult.data?.user || null;
+      refreshAuthUI();
+      if(!user){ setStatus('نشست ورود معتبر نیست؛ خارج شوید و دوباره وارد شوید.', '#fda4af'); return; }
+      syncing=true;
       try {
         setStatus('در حال دریافت گروه‌های ابری…');
         const {data, error} = await client.from('sahmino_groups').select('id,name,owner_id,invite_code,group_data,updated_at').order('updated_at',{ascending:false});
@@ -3740,18 +3748,22 @@
       finally { syncing=false; }
     }
     async function pushLocalGroups(){
-      if(!user || applyingRemote) return;
+      if(applyingRemote) return;
+      const authResult = await client.auth.getUser();
+      if(authResult.error) throw authResult.error;
+      user = authResult.data?.user || null;
+      if(!user) throw new Error('نشست کاربری معتبر نیست؛ دوباره وارد حساب شوید.');
       const groups = (appState?.groups||[]).map(normalizeGroup);
       for(const g of groups){
         // Cloud rows are owned by the signed-in account. Existing demo/local groups are imported on first sync.
         const payload = {name:g.name||'گروه سهمینو', owner_id:user.id, group_data:{...g}, updated_at:new Date().toISOString()};
         if(g.cloudId){
           const {error} = await client.from('sahmino_groups').update(payload).eq('id',g.cloudId);
-          if(error) throw error;
+          if(error) throw new Error('به‌روزرسانی گروه رد شد: '+error.message+(error.details?' | '+error.details:''));
         } else {
           const invite = (g.inviteCode || Math.random().toString(36).slice(2,10).toUpperCase());
           const {data,error} = await client.from('sahmino_groups').insert({...payload,invite_code:invite}).select('id,invite_code').single();
-          if(error) throw error;
+          if(error) throw new Error('ثبت گروه «'+(g.name||'بدون نام')+'» رد شد. user.id='+user.id+'؛ جزئیات Supabase: '+error.message+(error.details?' | '+error.details:'')+(error.hint?' | راهنما: '+error.hint:''));
           g.cloudId=data.id; g.inviteCode=data.invite_code;
           const {error:memberError} = await client.from('sahmino_group_members').insert({group_id:data.id,user_id:user.id,role:'owner'});
           if(memberError && !String(memberError.message||'').toLowerCase().includes('duplicate')) throw memberError;
