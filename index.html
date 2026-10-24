@@ -3654,5 +3654,161 @@
       renderAll();
     });
   </script>
+
+  <!-- Sahmino cloud sync / authentication -->
+  <div id="sahminoCloudPanel" dir="rtl" style="position:fixed;bottom:18px;left:18px;z-index:9998;font-family:inherit">
+    <button id="sahminoCloudToggle" type="button" style="background:#0891b2;color:white;border:1px solid #22d3ee;border-radius:14px;padding:10px 14px;font-weight:800;box-shadow:0 8px 30px #0005;cursor:pointer">☁ اتصال و همگام‌سازی</button>
+  </div>
+  <div id="sahminoCloudModal" dir="rtl" style="display:none;position:fixed;inset:0;z-index:9999;background:#020617d9;backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:18px;font-family:inherit">
+    <div style="width:min(100%,440px);background:#0f172a;color:#e2e8f0;border:1px solid #334155;border-radius:24px;padding:24px;box-shadow:0 25px 80px #0008">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><h2 style="font-size:20px;font-weight:900;margin:0">همگام‌سازی سهمینو</h2><button id="sahminoCloudClose" style="background:#1e293b;color:white;border:0;border-radius:10px;padding:7px 11px;cursor:pointer">✕</button></div>
+      <p style="font-size:13px;line-height:1.9;color:#94a3b8;margin:12px 0">با حساب ایمیل وارد شوید تا گروه‌ها و هزینه‌ها بین دستگاه‌ها همگام شوند. برای هر نفر باید حساب کاربری خودش ساخته شود.</p>
+      <label style="display:block;font-size:12px;margin:12px 0 6px">ایمیل</label><input id="sahminoAuthEmail" type="email" autocomplete="email" placeholder="you@example.com" style="width:100%;box-sizing:border-box;background:#020617;color:white;border:1px solid #475569;border-radius:12px;padding:12px;outline:none">
+      <label style="display:block;font-size:12px;margin:12px 0 6px">رمز عبور (حداقل ۶ کاراکتر)</label><input id="sahminoAuthPassword" type="password" autocomplete="current-password" placeholder="••••••••" style="width:100%;box-sizing:border-box;background:#020617;color:white;border:1px solid #475569;border-radius:12px;padding:12px;outline:none">
+      <div style="display:flex;gap:8px;margin-top:16px"><button id="sahminoSignIn" style="flex:1;background:#0891b2;color:white;border:0;border-radius:12px;padding:12px;font-weight:800;cursor:pointer">ورود</button><button id="sahminoSignUp" style="flex:1;background:#1e293b;color:white;border:1px solid #475569;border-radius:12px;padding:12px;font-weight:800;cursor:pointer">ساخت حساب</button></div>
+      <button id="sahminoSyncNow" style="display:none;width:100%;margin-top:10px;background:#059669;color:white;border:0;border-radius:12px;padding:12px;font-weight:800;cursor:pointer">همگام‌سازی اکنون</button>
+      <button id="sahminoSignOut" style="display:none;width:100%;margin-top:8px;background:#7f1d1d;color:white;border:0;border-radius:12px;padding:10px;font-weight:800;cursor:pointer">خروج از حساب</button>
+      <div id="sahminoCloudStatus" role="status" style="font-size:12px;line-height:1.8;margin-top:14px;color:#67e8f9">وضعیت: فقط ذخیره‌سازی روی همین دستگاه فعال است.</div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  (() => {
+    // Supabase project configuration: public publishable key only; never put service_role keys in a website.
+    const SAHMINO_SUPABASE_URL = 'https://rqycnnxmzkakukaoacsg.supabase.co';
+    const SAHMINO_SUPABASE_KEY = 'sb_publishable_u1C5z5Fnl0LG-fd8Jjyyog__A6Wr3Up';
+    const $ = id => document.getElementById(id);
+    const modal = $('sahminoCloudModal');
+    const status = $('sahminoCloudStatus');
+    let client = null, user = null, syncing = false, applyingRemote = false, syncTimer = null;
+    const setStatus = (msg, color='#67e8f9') => { status.textContent = msg; status.style.color = color; };
+    const showModal = () => { modal.style.display='flex'; refreshAuthUI(); };
+    const hideModal = () => { modal.style.display='none'; };
+    function refreshAuthUI(){
+      $('sahminoSignIn').style.display = user ? 'none' : '';
+      $('sahminoSignUp').style.display = user ? 'none' : '';
+      $('sahminoSyncNow').style.display = user ? '' : 'none';
+      $('sahminoSignOut').style.display = user ? '' : 'none';
+      $('sahminoAuthEmail').disabled = !!user; $('sahminoAuthPassword').disabled = !!user;
+      $('sahminoCloudToggle').textContent = user ? '☁ متصل: همگام‌سازی' : '☁ اتصال و همگام‌سازی';
+    }
+    function initClient(){
+      if (!window.supabase) throw new Error('کتابخانه اتصال بارگذاری نشد؛ اینترنت را بررسی کنید.');
+      if (!client) client = window.supabase.createClient(SAHMINO_SUPABASE_URL, SAHMINO_SUPABASE_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+      return client;
+    }
+    async function refreshUser(){
+      initClient(); const {data, error} = await client.auth.getSession(); if(error) throw error;
+      user = data.session?.user || null; refreshAuthUI(); return user;
+    }
+    async function signIn(signUp){
+      const email = $('sahminoAuthEmail').value.trim(), password = $('sahminoAuthPassword').value;
+      if (!email || !password) return setStatus('ایمیل و رمز عبور را وارد کنید.', '#fda4af');
+      if (password.length < 6) return setStatus('رمز عبور باید حداقل ۶ کاراکتر باشد.', '#fda4af');
+      try {
+        initClient(); setStatus(signUp ? 'در حال ساخت حساب…' : 'در حال ورود…');
+        const result = signUp ? await client.auth.signUp({email,password}) : await client.auth.signInWithPassword({email,password});
+        if(result.error) throw result.error;
+        if(signUp && !result.data.session){ setStatus('حساب ساخته شد. اگر تأیید ایمیل فعال است، ایمیل خود را تأیید کنید و سپس وارد شوید.', '#fcd34d'); return; }
+        user = result.data.user || result.data.session?.user || null; refreshAuthUI();
+        if(user){ await syncFromCloud(); setStatus('ورود موفق بود؛ اطلاعات ابری بارگذاری شد.', '#86efac'); }
+      } catch(e){ setStatus('خطا: '+(e.message || 'اتصال ناموفق بود'), '#fda4af'); }
+    }
+    function normalizeGroup(g){ return {...g, cloudId:g.cloudId || null}; }
+    async function syncFromCloud(){
+      if(!user || syncing) return; syncing=true;
+      try {
+        setStatus('در حال دریافت گروه‌های ابری…');
+        const {data, error} = await client.from('sahmino_groups').select('id,name,owner_id,invite_code,group_data,updated_at').order('updated_at',{ascending:false});
+        if(error) throw error;
+        const remote = (data||[]).map(row => normalizeGroup({...row.group_data, cloudId:row.id, inviteCode:row.invite_code || row.group_data?.inviteCode || ''}));
+        applyingRemote=true;
+        if(remote.length){
+          // Keep local-only groups and replace cloud-linked copies with their latest shared versions.
+          const cloudIds = new Set(remote.map(g=>g.cloudId));
+          const localOnly = (appState?.groups||[]).filter(g=>!g.cloudId || !cloudIds.has(g.cloudId));
+          appState.groups = [...remote, ...localOnly.filter(g=>!g.cloudId)];
+          if(!appState.groups.some(g=>g.id===appState.activeGroupId)) appState.activeGroupId=appState.groups[0]?.id;
+          saveState(); renderAll();
+        }
+        applyingRemote=false;
+        // Upload local groups once so the current account's data is available on other devices.
+        await pushLocalGroups();
+        setStatus('متصل؛ همگام‌سازی فعال است. گروه‌ها و هزینه‌ها در حساب شما ذخیره می‌شوند.', '#86efac');
+        startPolling();
+      } catch(e){ applyingRemote=false; setStatus('همگام‌سازی انجام نشد: '+(e.message||'خطای نامشخص')+' — دسترسی جدول‌ها و سیاست‌های RLS را بررسی کنید.', '#fda4af'); }
+      finally { syncing=false; }
+    }
+    async function pushLocalGroups(){
+      if(!user || applyingRemote) return;
+      const groups = (appState?.groups||[]).map(normalizeGroup);
+      for(const g of groups){
+        // Cloud rows are owned by the signed-in account. Existing demo/local groups are imported on first sync.
+        const payload = {name:g.name||'گروه سهمینو', owner_id:user.id, group_data:{...g}, updated_at:new Date().toISOString()};
+        if(g.cloudId){
+          const {error} = await client.from('sahmino_groups').update(payload).eq('id',g.cloudId);
+          if(error) throw error;
+        } else {
+          const invite = (g.inviteCode || Math.random().toString(36).slice(2,10).toUpperCase());
+          const {data,error} = await client.from('sahmino_groups').insert({...payload,invite_code:invite}).select('id,invite_code').single();
+          if(error) throw error;
+          g.cloudId=data.id; g.inviteCode=data.invite_code;
+          const {error:memberError} = await client.from('sahmino_group_members').insert({group_id:data.id,user_id:user.id,role:'owner'});
+          if(memberError && !String(memberError.message||'').toLowerCase().includes('duplicate')) throw memberError;
+        }
+      }
+      appState.groups=groups; localStorage.setItem(STORAGE_KEY,JSON.stringify(appState));
+    }
+    function queueSync(){
+      if(!user || applyingRemote) return;
+      clearTimeout(syncTimer); syncTimer=setTimeout(async()=>{
+        if(syncing) return;
+        syncing=true; try { await pushLocalGroups(); setStatus('تغییرات ذخیره شد و با فضای ابری همگام شد.', '#86efac'); }
+        catch(e){ setStatus('ذخیره ابری ناموفق بود: '+(e.message||'خطا در اتصال'), '#fda4af'); }
+        finally { syncing=false; }
+      },900);
+    }
+    let pollHandle=null;
+    function startPolling(){ if(pollHandle) clearInterval(pollHandle); pollHandle=setInterval(async()=>{
+      if(!user || syncing || document.hidden) return;
+      try {
+        const {data,error}=await client.from('sahmino_groups').select('id,name,owner_id,invite_code,group_data,updated_at').order('updated_at',{ascending:false});
+        if(error) throw error;
+        const remote=(data||[]).map(row=>normalizeGroup({...row.group_data,cloudId:row.id,inviteCode:row.invite_code||''}));
+        if(!remote.length) return;
+        const localCloud=(appState.groups||[]).filter(g=>g.cloudId);
+        const remoteById=new Map(remote.map(g=>[g.cloudId,g]));
+        // Update existing cloud-linked groups only when server data is newer than the last known snapshot.
+        let changed=false;
+        for(let i=0;i<appState.groups.length;i++){
+          const g=appState.groups[i]; if(!g.cloudId) continue;
+          const r=remoteById.get(g.cloudId); if(!r) continue;
+          const old=JSON.stringify({...g,cloudId:undefined}); const fresh=JSON.stringify({...r,cloudId:undefined});
+          if(old!==fresh){ appState.groups[i]=r; changed=true; }
+        }
+        for(const r of remote){ if(!appState.groups.some(g=>g.cloudId===r.cloudId)){ appState.groups.unshift(r); changed=true; } }
+        if(changed){ applyingRemote=true; if(!appState.groups.some(g=>g.id===appState.activeGroupId)) appState.activeGroupId=appState.groups[0]?.id; localStorage.setItem(STORAGE_KEY,JSON.stringify(appState)); renderAll(); applyingRemote=false; }
+      } catch(e){ console.warn('Sahmino cloud polling:',e.message); }
+    },7000); }
+    const originalSaveState = window.saveState || saveState;
+    // Keep the original local-first behavior; cloud sync runs in the background.
+    window.saveState = saveState = function(){
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); } catch(e){ console.error('Local save failed',e); }
+      if(user && !applyingRemote) queueSync();
+    };
+    $('sahminoCloudToggle').addEventListener('click',showModal);
+    $('sahminoCloudClose').addEventListener('click',hideModal);
+    modal.addEventListener('click',e=>{if(e.target===modal)hideModal();});
+    $('sahminoSignIn').addEventListener('click',()=>signIn(false));
+    $('sahminoSignUp').addEventListener('click',()=>signIn(true));
+    $('sahminoSyncNow').addEventListener('click',async()=>{try{await syncFromCloud();}catch(e){setStatus('خطا: '+e.message,'#fda4af');}});
+    $('sahminoSignOut').addEventListener('click',async()=>{try{await client.auth.signOut(); user=null; if(pollHandle)clearInterval(pollHandle); refreshAuthUI(); setStatus('از حساب خارج شدید؛ داده‌های همین دستگاه باقی می‌مانند.');}catch(e){setStatus('خطا در خروج: '+e.message,'#fda4af');}});
+    window.addEventListener('DOMContentLoaded',async()=>{
+      try { await refreshUser(); if(user){ await syncFromCloud(); } }
+      catch(e){ setStatus('اتصال ابری آماده نیست: '+(e.message||'خطا در اتصال'), '#fda4af'); }
+    });
+  })();
+  </script>
+
 </body>
 </html>
