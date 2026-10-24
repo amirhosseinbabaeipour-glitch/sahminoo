@@ -3383,14 +3383,30 @@
       showToast(`گروه جدید «${name}» ساخته شد!`);
     }
 
-    function deleteGroup(groupId) {
-      if (appState.groups.length <= 1) return;
-      appState.groups = appState.groups.filter(g => g.id !== groupId);
-      if (appState.activeGroupId === groupId) appState.activeGroupId = appState.groups[0].id;
-      saveState();
-      renderGroupsModalList();
-      renderAll();
-      showToast('گروه حذف شد.');
+    async function deleteGroup(groupId) {
+      if (appState.groups.length <= 1) {
+        showToast('حداقل یک گروه باید باقی بماند.');
+        return;
+      }
+      const group = appState.groups.find(g => g.id === groupId);
+      if (!group) return;
+      if (!confirm(`گروه «${group.name}» و اطلاعات آن حذف شود؟ این کار قابل بازگشت نیست.`)) return;
+
+      // If this group exists in Supabase, remove it from the cloud first.
+      // Keep the local copy intact if the remote deletion fails.
+      try {
+        if (group.cloudId && typeof window.sahminoDeleteCloudGroup === 'function') {
+          await window.sahminoDeleteCloudGroup(group.cloudId);
+        }
+        appState.groups = appState.groups.filter(g => g.id !== groupId);
+        if (appState.activeGroupId === groupId) appState.activeGroupId = appState.groups[0].id;
+        saveState();
+        renderGroupsModalList();
+        renderAll();
+        showToast('گروه با موفقیت حذف شد.');
+      } catch (error) {
+        showToast('حذف گروه انجام نشد: ' + (error.message || 'خطای اتصال به فضای ابری'));
+      }
     }
 
     function openEditGroupModal() {
@@ -3771,6 +3787,16 @@
       }
       appState.groups=groups; localStorage.setItem(STORAGE_KEY,JSON.stringify(appState));
     }
+    // Delete a cloud-backed group before removing its local copy.
+    window.sahminoDeleteCloudGroup = async function(cloudId){
+      if(!user) throw new Error('برای حذف گروه ابری، ابتدا وارد حساب سهمینو شوید.');
+      const authResult = await client.auth.getUser();
+      if(authResult.error) throw authResult.error;
+      user = authResult.data?.user || null;
+      if(!user) throw new Error('نشست کاربری معتبر نیست؛ دوباره وارد شوید.');
+      const {error} = await client.from('sahmino_groups').delete().eq('id', cloudId).eq('owner_id', user.id);
+      if(error) throw new Error(error.message || 'حذف از فضای ابری ناموفق بود.');
+    };
     function queueSync(){
       if(!user || applyingRemote) return;
       clearTimeout(syncTimer); syncTimer=setTimeout(async()=>{
