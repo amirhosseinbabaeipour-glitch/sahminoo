@@ -30,7 +30,6 @@
 
   <style>
     :root {
-      /* Default Accent Theme: Cyan-Blue (Ocean Fintech) */
       --accent-from: #06B6D4;
       --accent-to: #3B82F6;
       --accent-solid: #06B6D4;
@@ -40,7 +39,6 @@
       --accent-border: rgba(6, 182, 212, 0.35);
     }
 
-    /* Accent Theme 2: Electric Violet (Revolut Style) */
     [data-accent="violet"] {
       --accent-from: #6366F1;
       --accent-to: #A855F7;
@@ -51,7 +49,6 @@
       --accent-border: rgba(168, 85, 247, 0.38);
     }
 
-    /* Accent Theme 3: Emerald Mint */
     [data-accent="emerald"] {
       --accent-from: #10B981;
       --accent-to: #059669;
@@ -62,7 +59,6 @@
       --accent-border: rgba(16, 185, 129, 0.38);
     }
 
-    /* Accent Theme 4: Sunset Coral */
     [data-accent="coral"] {
       --accent-from: #F43F5E;
       --accent-to: #FB923C;
@@ -89,9 +85,7 @@
       direction: ltr;
     }
 
-    /* =====================================================
-       1. DARK MIDNIGHT GLASS (Default Mode)
-       ===================================================== */
+    /* 1. DARK MIDNIGHT GLASS */
     html.dark body {
       background-color: #0B0F19;
       background-image:
@@ -138,9 +132,7 @@
       border: 1px solid rgba(255, 255, 255, 0.12);
     }
 
-    /* =====================================================
-       2. SOFT FROST SLATE (Soft Light Mode - NO #FFFFFF)
-       ===================================================== */
+    /* 2. SOFT FROST SLATE */
     html:not(.dark) body {
       background-color: #DCE4EE;
       background-image:
@@ -186,7 +178,6 @@
       border: 1px solid rgba(15, 23, 42, 0.14);
     }
 
-    /* Dynamic Accent Utilities */
     .btn-accent {
       background: linear-gradient(135deg, var(--accent-from), var(--accent-to));
       color: #F8FAFC;
@@ -223,7 +214,6 @@
       color: #F8FAFC;
     }
 
-    /* Scrollbars */
     ::-webkit-scrollbar {
       width: 5px;
       height: 5px;
@@ -500,7 +490,7 @@
               </div>
 
               <p id="bannerGroupDesc" class="text-slate-300 text-xs sm:text-sm max-w-2xl leading-relaxed">
-                مدیریت کامل خرج‌های ویلا، رستوران، تله‌کابین و خریدهای سوپرمارکتی با تسویه هوشمند کمترین تراکنش
+                مدیریت کامل خرج‌های ویلا، رستوران، تله‌کابین و خریدهای سوپرمارکتی با تسویه دقیق فاکتور به فاکتور
               </p>
             </div>
 
@@ -595,28 +585,38 @@
             <!-- Left: Quick Settlement Transfers (7 cols) -->
             <div class="md:col-span-7 glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 flex flex-col justify-between min-w-0">
               <div>
-                <div class="flex items-start sm:items-center justify-between gap-2 mb-4">
+                <div class="flex items-start sm:items-center justify-between gap-2 mb-3">
                   <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
                     <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl accent-badge flex items-center justify-center shrink-0">
                       <i class="fa-solid fa-money-bill-transfer text-base sm:text-lg"></i>
                     </div>
                     <div class="min-w-0">
-                      <h3 class="font-extrabold text-sm sm:text-base truncate">پیشنهاد هوشمند تسویه‌حساب</h3>
-                      <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">کوتاه‌ترین مسیر برای صاف کردن حساب‌ها</p>
+                      <h3 class="font-extrabold text-sm sm:text-base truncate">لیست تسویه‌حساب و کارت‌به‌کارت</h3>
+                      <p id="dashboardSettleSub" class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">محاسبه دقیق و مستقیم بر اساس هر فاکتور</p>
                     </div>
                   </div>
                   <button onclick="switchTab('settlement')" class="text-[11px] sm:text-xs font-bold accent-text hover:underline shrink-0">
-                    جزئیات <i class="fa-solid fa-arrow-left mr-0.5"></i>
+                    جزئیات کامل <i class="fa-solid fa-arrow-left mr-0.5"></i>
                   </button>
                 </div>
 
-                <div id="dashboardQuickSettlement" class="space-y-2.5 max-h-[560px] overflow-y-auto pr-1">
+                <!-- Settlement Mode Switcher inside Dashboard -->
+                <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl glass-subcard mb-3.5 text-[11px] font-bold">
+                  <button type="button" onclick="setSettlementMode('direct')" id="dashModeBtn-direct" class="py-1.5 px-2 rounded-lg btn-accent transition">
+                    ۱. مستقیم (فاکتور به فاکتور)
+                  </button>
+                  <button type="button" onclick="setSettlementMode('smart')" id="dashModeBtn-smart" class="py-1.5 px-2 rounded-lg text-slate-400 transition">
+                    ۲. تهاتر ضربدری (کمترین واریز)
+                  </button>
+                </div>
+
+                <div id="dashboardQuickSettlement" class="space-y-2.5">
                   <!-- Populated by JS -->
                 </div>
               </div>
 
               <div class="mt-4 pt-3 border-t border-slate-500/15 flex items-center justify-between text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">
-                <span>محاسبه خودکار بدهکار و بستانکار</span>
+                <span>امکان تغییر روش تسویه در تب تسویه‌حساب</span>
                 <button onclick="openReportModal()" class="accent-text font-bold hover:underline">
                   <i class="fa-regular fa-copy ml-1"></i>کپی گزارش تسویه
                 </button>
@@ -713,25 +713,35 @@
         </div>
 
         <!-- ===================================================== -->
-        <!-- TAB 3: SMART SETTLEMENT (تسویه‌حساب هوشمند)            -->
+        <!-- TAB 3: SMART SETTLEMENT (تسویه‌حساب هوشمند و مستقیم)   -->
         <!-- ===================================================== -->
         <div id="tabContent-settlement" class="tab-view hidden animate-fade-slide space-y-4 sm:space-y-6">
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
 
-            <!-- Left: Minimum Cash-Flow Transfers (6 cols) -->
+            <!-- Left: Settlement Transfers (6 cols) -->
             <div class="lg:col-span-6 space-y-4 sm:space-y-5 min-w-0">
               <div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6">
-                <div class="flex items-center gap-3 mb-4">
+                <div class="flex items-center gap-3 mb-3">
                   <div class="w-10 h-10 rounded-xl accent-badge flex items-center justify-center shrink-0">
                     <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
                   </div>
                   <div>
-                    <h3 class="font-extrabold text-sm sm:text-lg">کارت‌به‌کارت‌های پیشنهادی</h3>
-                    <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">تسویه کامل گروه با کمترین تراکنش بانکی ممکن</p>
+                    <h3 class="font-extrabold text-sm sm:text-lg">کارت‌به‌کارت‌های تسویه‌حساب</h3>
+                    <p id="settleModeExplain" class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">تسویه مستقیم هر فرد با پرداخت‌کننده همان فاکتور (همراه با کسر بدهی متقابل دو نفره)</p>
                   </div>
                 </div>
 
-                <div id="settlementTransactionsList" class="space-y-3 mt-4">
+                <!-- Settlement Mode Switcher -->
+                <div class="grid grid-cols-2 gap-1.5 p-1.5 rounded-2xl glass-subcard mb-4 text-xs font-bold">
+                  <button type="button" onclick="setSettlementMode('direct')" id="settleModeBtn-direct" class="py-2 px-2.5 rounded-xl btn-accent transition">
+                    ۱. مستقیم (فاکتور به فاکتور)
+                  </button>
+                  <button type="button" onclick="setSettlementMode('smart')" id="settleModeBtn-smart" class="py-2 px-2.5 rounded-xl text-slate-400 transition">
+                    ۲. تهاتر ضربدری (کمترین واریز)
+                  </button>
+                </div>
+
+                <div id="settlementTransactionsList" class="space-y-3 mt-3">
                   <!-- Populated by JS -->
                 </div>
 
@@ -760,12 +770,12 @@
               <div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6">
                 <div class="flex flex-wrap items-center justify-between gap-2 mb-4 sm:mb-5">
                   <div>
-                    <h3 class="font-extrabold text-sm sm:text-lg">نمودار افقی تراز مالی اعضا</h3>
-                    <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">تفاوت کل پرداختی با کل سهم مصرفی هر نفر</p>
+                    <h3 class="font-extrabold text-sm sm:text-lg">نمودار افقی تراز کل اعضا</h3>
+                    <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">تفاوت کل پرداختی با کل سهم مصرفی هر نفر در گروه</p>
                   </div>
                   <div class="flex items-center gap-3 text-[11px] font-bold">
-                    <span class="flex items-center gap-1 text-emerald-500"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> بستانکار</span>
-                    <span class="flex items-center gap-1 text-rose-500"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> بدهکار</span>
+                    <span class="flex items-center gap-1 text-emerald-500"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> بستانکار کل</span>
+                    <span class="flex items-center gap-1 text-rose-500"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> بدهکار کل</span>
                   </div>
                 </div>
 
@@ -813,14 +823,12 @@
               <!-- Left: Graphical HTML5 Canvas Wheel (7 cols) -->
               <div class="lg:col-span-7 flex flex-col items-center justify-center min-w-0">
                 <div class="relative flex items-center justify-center p-2.5 sm:p-3 rounded-full glass-subcard shadow-2xl">
-                  <!-- Top Pointer Needle -->
                   <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-20 drop-shadow-lg">
                     <div class="w-0 h-0 border-l-[12px] sm:border-l-[14px] border-l-transparent border-r-[12px] sm:border-r-[14px] border-r-transparent border-t-[22px] sm:border-t-[26px] border-t-amber-400"></div>
                   </div>
 
                   <canvas id="rouletteCanvas" width="340" height="340" class="w-[260px] h-[260px] sm:w-[340px] sm:h-[340px] max-w-full rounded-full cursor-pointer" onclick="spinCanvasWheel()"></canvas>
 
-                  <!-- Center Spin Hub Button -->
                   <button onclick="spinCanvasWheel()" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-900 text-white border-4 border-amber-400 shadow-xl absolute flex items-center justify-center font-black text-[11px] sm:text-xs hover:scale-105 active:scale-95 transition">
                     بچرخون!
                   </button>
@@ -839,7 +847,6 @@
                   </div>
                 </div>
 
-                <!-- Winner Status Box -->
                 <div id="rouletteResultCard" class="p-4 sm:p-5 rounded-2xl glass-subcard text-center space-y-2 border border-white/10">
                   <div class="text-xs text-slate-400 font-semibold">نتیجه قرعه‌کشی:</div>
                   <div id="rouletteWinnerName" class="text-lg sm:text-2xl font-black accent-text py-1">
@@ -1423,7 +1430,6 @@
   <!-- ========================================================= -->
   <div id="sahminoCloudModal" dir="rtl" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto no-print">
     <div class="glass-modal w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden animate-fade-slide">
-      <!-- Modal Header -->
       <div class="px-5 sm:px-6 py-4 border-b border-slate-500/15 flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <div class="w-9 h-9 rounded-xl accent-badge flex items-center justify-center shrink-0">
@@ -1439,13 +1445,11 @@
         </button>
       </div>
 
-      <!-- Modal Body -->
       <div class="p-5 sm:p-6 space-y-4">
         <p class="text-xs leading-relaxed text-slate-400">
           با ایمیل خود وارد شوید تا تمام گروه‌ها و هزینه‌ها به‌صورت زنده در فضای ابری ذخیره و بین دستگاه‌های شما همگام‌سازی شوند.
         </p>
 
-        <!-- Connected User Badge (Shown when logged in) -->
         <div id="sahminoConnectedUserBox" class="hidden p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-between gap-2">
           <div class="flex items-center gap-2.5 min-w-0">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
@@ -1457,7 +1461,6 @@
           <span class="text-[10px] px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 font-bold shrink-0">فعال</span>
         </div>
 
-        <!-- Auth Inputs -->
         <div id="sahminoAuthFields" class="space-y-3">
           <div>
             <label class="block text-xs font-bold mb-1.5">ایمیل حساب کاربری</label>
@@ -1469,7 +1472,6 @@
           </div>
         </div>
 
-        <!-- Action Buttons -->
         <div id="sahminoAuthButtons" class="grid grid-cols-2 gap-2.5 pt-1">
           <button id="sahminoSignIn" type="button" class="py-3 px-4 rounded-xl btn-accent font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5">
             <i class="fa-solid fa-right-to-bracket"></i>
@@ -1492,7 +1494,6 @@
           </button>
         </div>
 
-        <!-- Status Box -->
         <div id="sahminoCloudStatus" role="status" class="p-3 rounded-xl glass-subcard text-xs leading-relaxed font-semibold text-cyan-300">
           وضعیت: فقط ذخیره‌سازی روی همین دستگاه فعال است.
         </div>
@@ -1506,7 +1507,6 @@
   <script>
     const STORAGE_KEY = 'sahmino_pro_fintech_v4';
 
-    // Categories with Modern Fintech Badges & Hex Colors
     const CATEGORIES = {
       food:       { label: 'غذا و رستوران',     emoji: '🍔', badge: 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30',        hex: '#06B6D4' },
       stay:       { label: 'اقامت و ویلا',      emoji: '🏠', badge: 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/30', hex: '#6366F1' },
@@ -1529,13 +1529,11 @@
       'from-sky-500 to-indigo-600'
     ];
 
-    // Wheel Slice Palette for HTML5 Canvas Roulette
     const WHEEL_PALETTE = [
       '#06B6D4', '#6366F1', '#10B981', '#F43F5E',
       '#F59E0B', '#A855F7', '#3B82F6', '#EC4899'
     ];
 
-    // Iranian Bank BIN Prefix Dictionary (6 Digits)
     const IRAN_BANKS = {
       '621986': { name: 'بلوبانک / سامان', badge: 'bg-sky-500/20 text-sky-400 border border-sky-500/30' },
       '610433': { name: 'بانک ملت', badge: 'bg-rose-500/20 text-rose-400 border border-rose-500/30' },
@@ -1565,12 +1563,12 @@
       return IRAN_BANKS[bin] || { name: 'شبکه شتاب بانکی', badge: 'bg-slate-500/20 text-slate-300 border border-slate-500/30' };
     }
 
-    // 3 Rich Default Groups
     function getInitialDemoData() {
       return {
         activeGroupId: 'grp_ramsar',
         theme: 'dark',
         accent: 'cyan',
+        settlementMode: 'direct',
         groups: [
           {
             id: 'grp_ramsar',
@@ -1578,7 +1576,7 @@
             emoji: '🌊',
             currency: 'تومان',
             budget: 18000000,
-            description: 'مدیریت کامل خرج‌های ویلا، رستوران، تله‌کابین و خریدهای سوپرمارکتی با تسویه هوشمند کمترین تراکنش',
+            description: 'مدیریت کامل خرج‌های ویلا، رستوران، تله‌کابین و خریدهای سوپرمارکتی با تسویه دقیق',
             members: [
               { id: 'm1', name: 'علی رضایی', defaultWeight: 1, card: '6219-8610-4512-9081', phone: '09121112233', color: 'from-cyan-500 to-blue-600' },
               { id: 'm2', name: 'سارا محمدی', defaultWeight: 1, card: '6104-3378-4455-9988', phone: '09123334455', color: 'from-rose-500 to-orange-500' },
@@ -1753,6 +1751,7 @@
     let currentTab = 'dashboard';
     let currentPayerMode = 'single';
     let currentSplitMethod = 'equal';
+    let settlementMode = 'direct'; // 'direct' (Pairwise Invoice-by-Invoice) | 'smart' (Minimum Cash-Flow)
     let selectedAvatarColor = AVATAR_COLORS[0];
     let pendingSharedGroup = null;
 
@@ -1761,9 +1760,6 @@
     let isSpinningWheel = false;
     let lastRouletteWinnerId = null;
 
-    // =========================================================
-    // PERSIAN DIGITS & FULL NUMBER-TO-WORDS CONVERTER
-    // =========================================================
     function toPersianDigits(str) {
       if (str === null || str === undefined) return '';
       const persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
@@ -1786,39 +1782,6 @@
       if (val === null || val === undefined) return 0;
       const clean = toEnglishDigits(String(val)).replace(/[^0-9]/g, '');
       return parseInt(clean, 10) || 0;
-    }
-
-
-    // Allocate an integer amount proportionally while ensuring the result sums
-    // exactly to the original total (prevents rounding-created debts/credits).
-    function allocateExactAmount(totalAmount, weightedEntries) {
-      const total = Math.max(0, Math.round(Number(totalAmount) || 0));
-      const entries = weightedEntries
-        .map((entry, index) => ({
-          id: entry.id,
-          weight: Math.max(0, Number(entry.weight) || 0),
-          index
-        }))
-        .filter(entry => entry.weight > 0);
-      const weightSum = entries.reduce((sum, entry) => sum + entry.weight, 0);
-      const result = {};
-      if (!entries.length || weightSum <= 0) return result;
-
-      let allocated = 0;
-      const fractions = entries.map(entry => {
-        const exact = total * entry.weight / weightSum;
-        const base = Math.floor(exact);
-        result[entry.id] = base;
-        allocated += base;
-        return { id: entry.id, fraction: exact - base, index: entry.index };
-      });
-
-      let remainder = total - allocated;
-      fractions.sort((a, b) => (b.fraction - a.fraction) || (a.index - b.index));
-      for (let i = 0; i < remainder; i++) {
-        result[fractions[i % fractions.length].id] += 1;
-      }
-      return result;
     }
 
     function numberToPersianWords(num, currency = 'تومان') {
@@ -1875,6 +1838,26 @@
       }
     }
 
+    // Exact Remainder Distribution Helper
+    function distributeExactShares(totalAmount, weightsMap) {
+      const entries = Object.entries(weightsMap).filter(([_, w]) => Number(w) > 0);
+      const totalWeight = entries.reduce((acc, [_, w]) => acc + Number(w), 0);
+      const result = {};
+      if (entries.length === 0 || totalWeight <= 0 || totalAmount <= 0) return result;
+
+      let allocated = 0;
+      entries.forEach(([id, w], idx) => {
+        if (idx === entries.length - 1) {
+          result[id] = Math.max(0, Math.round(totalAmount - allocated));
+        } else {
+          const share = Math.round((totalAmount * Number(w)) / totalWeight);
+          result[id] = share;
+          allocated += share;
+        }
+      });
+      return result;
+    }
+
     // =========================================================
     // STATE MANAGEMENT & THEME INITIALIZATION
     // =========================================================
@@ -1890,6 +1873,7 @@
       } catch (e) {
         appState = getInitialDemoData();
       }
+      settlementMode = appState.settlementMode || 'direct';
       applyTheme(appState.theme || 'dark');
       setAccentTheme(appState.accent || 'cyan', false);
       checkIncomingSharedUrl();
@@ -1912,7 +1896,15 @@
       return grp;
     }
 
-    // 4 Neon Accent Theme Switcher
+    function setSettlementMode(mode) {
+      settlementMode = mode;
+      if (appState) {
+        appState.settlementMode = mode;
+        saveState();
+      }
+      renderAll();
+    }
+
     function setAccentTheme(accentName, notify = true) {
       document.body.setAttribute('data-accent', accentName);
       if (appState) {
@@ -1958,7 +1950,6 @@
       }
     }
 
-    // Check Incoming URL Hash Share
     function checkIncomingSharedUrl() {
       try {
         const hash = window.location.hash || '';
@@ -2000,10 +1991,15 @@
     }
 
     // =========================================================
-    // CORE FINANCIAL & MINIMUM CASH-FLOW ENGINE
+    // DUAL FINANCIAL & SETTLEMENT ENGINE:
+    // 1. Direct Pairwise (فاکتور به فاکتور - بدون انتقال بدهی به شخص ثالث)
+    // 2. Smart Minimum Cash-Flow (تهاتر ضربدری کل گروه)
     // =========================================================
     function calculateGroupFinancials(group) {
       const memberStats = {};
+      const rawPairDebt = {};
+      const rawPairReasons = {};
+
       group.members.forEach(m => {
         memberStats[m.id] = {
           id: m.id,
@@ -2018,37 +2014,67 @@
           realExpensesPaid: 0,
           realExpensesShare: 0
         };
+        rawPairDebt[m.id] = {};
+        rawPairReasons[m.id] = {};
+        group.members.forEach(m2 => {
+          rawPairDebt[m.id][m2.id] = 0;
+          rawPairReasons[m.id][m2.id] = [];
+        });
       });
 
       let totalGroupRealExpenses = 0;
 
       group.expenses.forEach(exp => {
         const amt = Number(exp.amount) || 0;
+        if (amt <= 0) return;
         const isSettlement = exp.category === 'settlement';
 
         if (!isSettlement) {
           totalGroupRealExpenses += amt;
         }
 
-        if (exp.payerMode === 'multi' && exp.payers) {
+        // Normalize Payers Map
+        let payersMap = {};
+        if (exp.payerMode === 'multi' && exp.payers && Object.keys(exp.payers).length > 0) {
           Object.entries(exp.payers).forEach(([mId, pAmt]) => {
-            if (memberStats[mId]) {
-              const p = Number(pAmt) || 0;
-              memberStats[mId].paid += p;
-              if (!isSettlement) memberStats[mId].realExpensesPaid += p;
+            const p = Number(pAmt) || 0;
+            if (p > 0 && memberStats[mId]) {
+              payersMap[mId] = (payersMap[mId] || 0) + p;
             }
           });
         } else if (exp.payerId && memberStats[exp.payerId]) {
-          memberStats[exp.payerId].paid += amt;
-          if (!isSettlement) memberStats[exp.payerId].realExpensesPaid += amt;
+          payersMap[exp.payerId] = amt;
         }
 
+        const totalPaidInExp = Object.values(payersMap).reduce((a, b) => a + b, 0);
+
+        Object.entries(payersMap).forEach(([mId, p]) => {
+          memberStats[mId].paid += p;
+          if (!isSettlement) memberStats[mId].realExpensesPaid += p;
+        });
+
+        // Splits & Direct Pairwise Matrix Accumulation
         if (exp.splits) {
-          Object.entries(exp.splits).forEach(([mId, sAmt]) => {
-            if (memberStats[mId]) {
-              const s = Number(sAmt) || 0;
-              memberStats[mId].share += s;
-              if (!isSettlement) memberStats[mId].realExpensesShare += s;
+          Object.entries(exp.splits).forEach(([sId, sAmt]) => {
+            const s = Number(sAmt) || 0;
+            if (s <= 0 || !memberStats[sId]) return;
+
+            memberStats[sId].share += s;
+            if (!isSettlement) memberStats[sId].realExpensesShare += s;
+
+            if (totalPaidInExp > 0) {
+              Object.entries(payersMap).forEach(([pId, pAmt]) => {
+                if (pId === sId || !memberStats[pId]) return;
+                const owedToThisPayer = s * (pAmt / totalPaidInExp);
+                if (owedToThisPayer > 0) {
+                  rawPairDebt[sId][pId] += owedToThisPayer;
+                  rawPairReasons[sId][pId].push({
+                    title: exp.title,
+                    amount: Math.round(owedToThisPayer),
+                    isSettlement
+                  });
+                }
+              });
             }
           });
         }
@@ -2058,21 +2084,55 @@
         st.net = Math.round(st.paid - st.share);
       });
 
-      // A balanced ledger must have total net balance equal to zero.
-      // If not, do not issue potentially misleading transfer instructions.
-      const balanceMismatch = Math.round(
-        Object.values(memberStats).reduce((sum, st) => sum + st.net, 0)
-      );
+      // Mode 1: Direct Pairwise Transactions (Mutual 2-Person Netting only)
+      const directTransactions = [];
+      const memberIds = group.members.map(m => m.id);
+      for (let i = 0; i < memberIds.length; i++) {
+        for (let j = i + 1; j < memberIds.length; j++) {
+          const u = memberIds[i];
+          const v = memberIds[j];
+          const uOwesV = rawPairDebt[u][v] || 0;
+          const vOwesU = rawPairDebt[v][u] || 0;
+          const netDiff = Math.round(uOwesV - vOwesU);
 
-      // Greedy Minimum Cash-Flow Algorithm. Amounts are whole currency units,
-      // so do not discard small legitimate balances using an arbitrary threshold.
+          if (netDiff > 10) {
+            directTransactions.push({
+              fromId: u,
+              fromName: memberStats[u].name,
+              toId: v,
+              toName: memberStats[v].name,
+              toCard: memberStats[v].card,
+              amount: netDiff,
+              grossOwed: Math.round(uOwesV),
+              mutualOffset: Math.round(vOwesU),
+              reasonsOwed: rawPairReasons[u][v],
+              reasonsOffset: rawPairReasons[v][u]
+            });
+          } else if (netDiff < -10) {
+            directTransactions.push({
+              fromId: v,
+              fromName: memberStats[v].name,
+              toId: u,
+              toName: memberStats[u].name,
+              toCard: memberStats[u].card,
+              amount: Math.abs(netDiff),
+              grossOwed: Math.round(vOwesU),
+              mutualOffset: Math.round(uOwesV),
+              reasonsOwed: rawPairReasons[v][u],
+              reasonsOffset: rawPairReasons[u][v]
+            });
+          }
+        }
+      }
+
+      // Mode 2: Smart Minimum Cash-Flow Algorithm (Global Cross-Netting)
       const debtors = [];
       const creditors = [];
 
       Object.values(memberStats).forEach(st => {
-        if (st.net < 0) {
+        if (st.net < -10) {
           debtors.push({ id: st.id, name: st.name, amount: Math.abs(st.net) });
-        } else if (st.net > 0) {
+        } else if (st.net > 10) {
           creditors.push({ id: st.id, name: st.name, card: st.card, amount: st.net });
         }
       });
@@ -2080,39 +2140,56 @@
       debtors.sort((a, b) => b.amount - a.amount);
       creditors.sort((a, b) => b.amount - a.amount);
 
-      const transactions = [];
-      let i = 0, j = 0;
+      const smartTransactions = [];
+      let dIdx = 0, cIdx = 0;
 
-      if (balanceMismatch === 0) {
-        while (i < debtors.length && j < creditors.length) {
-          const debtor = debtors[i];
-          const creditor = creditors[j];
-          const settleAmt = Math.min(debtor.amount, creditor.amount);
+      while (dIdx < debtors.length && cIdx < creditors.length) {
+        const debtor = debtors[dIdx];
+        const creditor = creditors[cIdx];
+        const settleAmt = Math.min(debtor.amount, creditor.amount);
 
-          if (settleAmt > 0) {
-            transactions.push({
-              fromId: debtor.id,
-              fromName: debtor.name,
-              toId: creditor.id,
-              toName: creditor.name,
-              toCard: creditor.card,
-              amount: Math.round(settleAmt)
-            });
-          }
-
-          debtor.amount -= settleAmt;
-          creditor.amount -= settleAmt;
-          if (debtor.amount <= 0) i++;
-          if (creditor.amount <= 0) j++;
+        if (settleAmt > 10) {
+          smartTransactions.push({
+            fromId: debtor.id,
+            fromName: debtor.name,
+            toId: creditor.id,
+            toName: creditor.name,
+            toCard: creditor.card,
+            amount: Math.round(settleAmt),
+            grossOwed: Math.round(settleAmt),
+            mutualOffset: 0,
+            reasonsOwed: [],
+            reasonsOffset: []
+          });
         }
+
+        debtor.amount -= settleAmt;
+        creditor.amount -= settleAmt;
+        if (debtor.amount <= 10) dIdx++;
+        if (creditor.amount <= 10) cIdx++;
       }
+
+      const activeTransactions = settlementMode === 'smart' ? smartTransactions : directTransactions;
 
       return {
         totalGroupRealExpenses,
         memberStats,
-        transactions,
-        balanceMismatch
+        transactions: activeTransactions,
+        directTransactions,
+        smartTransactions
       };
+    }
+
+    function formatTransactionBreakdown(tx) {
+      if (!tx.reasonsOwed || tx.reasonsOwed.length === 0) {
+        return 'محاسبه‌شده با تهاتر ضربدری کل گروه';
+      }
+      const owedParts = tx.reasonsOwed.map(r => `${r.title} (${formatAmount(r.amount)})`).join(' + ');
+      if (tx.mutualOffset > 0 && tx.reasonsOffset && tx.reasonsOffset.length > 0) {
+        const offsetParts = tx.reasonsOffset.map(r => `${r.title} (${formatAmount(r.amount)})`).join(' + ');
+        return `بابت: ${owedParts} — کسر طلب متقابل: ${offsetParts}`;
+      }
+      return `بابت: ${owedParts}`;
     }
 
     // =========================================================
@@ -2124,6 +2201,29 @@
 
       const currency = group.currency || 'تومان';
       const financials = calculateGroupFinancials(group);
+
+      // Update Mode Toggle Buttons UI
+      ['direct', 'smart'].forEach(m => {
+        const b1 = document.getElementById(`dashModeBtn-${m}`);
+        const b2 = document.getElementById(`settleModeBtn-${m}`);
+        if (m === settlementMode) {
+          if (b1) b1.className = 'py-1.5 px-2 rounded-lg btn-accent transition';
+          if (b2) b2.className = 'py-2 px-2.5 rounded-xl btn-accent transition';
+        } else {
+          if (b1) b1.className = 'py-1.5 px-2 rounded-lg text-slate-400 transition';
+          if (b2) b2.className = 'py-2 px-2.5 rounded-xl text-slate-400 transition';
+        }
+      });
+
+      const explainEl = document.getElementById('settleModeExplain');
+      const dashSubEl = document.getElementById('dashboardSettleSub');
+      if (settlementMode === 'direct') {
+        if (explainEl) explainEl.textContent = 'حالت مستقیم: هر شخص دقیقاً به پرداخت‌کننده همان فاکتور بدهکار است (فقط بدهی متقابل دو نفره کسر می‌شود).';
+        if (dashSubEl) dashSubEl.textContent = 'محاسبه دقیق و مستقیم بر اساس هر فاکتور';
+      } else {
+        if (explainEl) explainEl.textContent = 'حالت تهاتر ضربدری: بدهی‌های افراد با کل گروه تهاتر می‌شود تا با کمترین کارت‌به‌کارت تسویه انجام شود.';
+        if (dashSubEl) dashSubEl.textContent = 'کوتاه‌ترین مسیر با تهاتر ضربدری کل گروه';
+      }
 
       // Header & Hero
       document.getElementById('headerGroupEmoji').textContent = group.emoji || '🌊';
@@ -2154,11 +2254,9 @@
 
       const txCount = financials.transactions.length;
       document.getElementById('statSettlementStatus').innerHTML =
-        Math.abs(financials.balanceMismatch || 0) > 0
-          ? '<span class="text-rose-400"><i class="fa-solid fa-triangle-exclamation ml-1"></i>بررسی سهم‌ها</span>'
-          : txCount === 0
-            ? '<span class="text-emerald-400"><i class="fa-solid fa-circle-check ml-1"></i>تسویه کامل</span>'
-            : `<span class="text-amber-300">${toPersianDigits(txCount)} تراکنش مانده</span>`;
+        txCount === 0
+          ? '<span class="text-emerald-400"><i class="fa-solid fa-circle-check ml-1"></i>تسویه کامل</span>'
+          : `<span class="text-amber-300">${toPersianDigits(txCount)} واریزی مانده</span>`;
 
       // Sidebar Badges
       document.getElementById('sideBadgeExpenses').textContent = toPersianDigits(group.expenses.length);
@@ -2229,13 +2327,8 @@
     function renderDashboardTab(group, financials) {
       const currency = group.currency || 'تومان';
       const quickSettleEl = document.getElementById('dashboardQuickSettlement');
-      const balanceWarning = Math.abs(financials.balanceMismatch || 0) > 0
-        ? `<div class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs leading-relaxed"><b>خطای تراز حساب:</b> مجموع پرداختی‌ها و سهم‌ها ${formatAmount(Math.abs(financials.balanceMismatch))} ${currency} اختلاف دارد. تا زمان اصلاح فاکتورها و سهم‌ها، پیشنهاد تسویه نمایش داده نمی‌شود.</div>`
-        : '';
 
-      if (Math.abs(financials.balanceMismatch || 0) > 0) {
-        quickSettleEl.innerHTML = balanceWarning;
-      } else if (financials.transactions.length === 0) {
+      if (financials.transactions.length === 0) {
         quickSettleEl.innerHTML = `
           <div class="p-5 rounded-2xl glass-subcard text-center">
             <i class="fa-solid fa-circle-check text-2xl text-emerald-400 mb-1.5"></i>
@@ -2244,22 +2337,26 @@
           </div>
         `;
       } else {
-        quickSettleEl.innerHTML = financials.transactions.map(tx => {
+        quickSettleEl.innerHTML = financials.transactions.slice(0, 5).map(tx => {
           const bank = detectIranianBank(tx.toCard);
+          const breakdown = formatTransactionBreakdown(tx);
           return `
-            <div class="p-3 sm:p-3.5 rounded-2xl glass-subcard flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-              <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap text-xs sm:text-sm min-w-0">
-                <span class="font-bold text-rose-400">${tx.fromName}</span>
-                <i class="fa-solid fa-arrow-left text-[10px] text-slate-400"></i>
-                <span class="font-bold text-emerald-400">${tx.toName}</span>
-                ${bank ? `<span class="text-[10px] px-2 py-0.5 rounded-md ${bank.badge} font-bold">${bank.name}</span>` : ''}
+            <div class="p-3 sm:p-3.5 rounded-2xl glass-subcard space-y-1.5">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap text-xs sm:text-sm min-w-0">
+                  <span class="font-bold text-rose-400">${tx.fromName}</span>
+                  <i class="fa-solid fa-arrow-left text-[10px] text-slate-400"></i>
+                  <span class="font-bold text-emerald-400">${tx.toName}</span>
+                  ${bank ? `<span class="text-[10px] px-2 py-0.5 rounded-md ${bank.badge} font-bold">${bank.name}</span>` : ''}
+                </div>
+                <div class="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+                  <span class="font-black text-xs sm:text-sm">${formatAmount(tx.amount)} <span class="text-[10px] font-normal text-slate-400">${currency}</span></span>
+                  <button onclick="markTransactionSettled('${tx.fromId}', '${tx.toId}', ${tx.amount})" class="px-2.5 py-1 rounded-lg btn-accent text-[11px] font-bold">
+                    تسویه شد
+                  </button>
+                </div>
               </div>
-              <div class="flex items-center justify-between sm:justify-end gap-2 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-500/10">
-                <span class="font-black text-xs sm:text-sm">${formatAmount(tx.amount)} <span class="text-[10px] font-normal text-slate-400">${currency}</span></span>
-                <button onclick="markTransactionSettled('${tx.fromId}', '${tx.toId}', ${tx.amount})" class="px-2.5 py-1 rounded-lg btn-accent text-[11px] font-bold">
-                  تسویه شد
-                </button>
-              </div>
+              <div class="text-[10px] sm:text-[11px] text-slate-400 leading-relaxed">${breakdown}</div>
             </div>
           `;
         }).join('');
@@ -2341,10 +2438,10 @@
         const paidWidth = Math.round((st.realExpensesPaid / maxVal) * 100);
         const shareWidth = Math.round((st.realExpensesShare / maxVal) * 100);
         const net = st.net;
-        const netBadge = net > 0
-          ? `<span class="px-2 sm:px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-extrabold text-[11px] sm:text-xs">+${formatAmount(net)} بستانکار</span>`
-          : net < 0
-          ? `<span class="px-2 sm:px-2.5 py-0.5 rounded-lg bg-rose-500/20 text-rose-400 border border-rose-500/30 font-extrabold text-[11px] sm:text-xs">-${formatAmount(Math.abs(net))} بدهکار</span>`
+        const netBadge = net > 10
+          ? `<span class="px-2 sm:px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-extrabold text-[11px] sm:text-xs">+${formatAmount(net)} بستانکار کل</span>`
+          : net < -10
+          ? `<span class="px-2 sm:px-2.5 py-0.5 rounded-lg bg-rose-500/20 text-rose-400 border border-rose-500/30 font-extrabold text-[11px] sm:text-xs">-${formatAmount(Math.abs(net))} بدهکار کل</span>`
           : `<span class="px-2 sm:px-2.5 py-0.5 rounded-lg accent-badge font-bold text-[11px] sm:text-xs">تسویه شده</span>`;
 
         return `
@@ -2490,18 +2587,13 @@
     }
 
     // =========================================================
-    // RENDER TAB 3: SMART SETTLEMENT & HORIZONTAL BALANCE BARS
+    // RENDER TAB 3: SMART & DIRECT SETTLEMENT
     // =========================================================
     function renderSettlementTab(group, financials) {
       const currency = group.currency || 'تومان';
       const txContainer = document.getElementById('settlementTransactionsList');
-      const balanceWarning = Math.abs(financials.balanceMismatch || 0) > 0
-        ? `<div class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs leading-relaxed"><b>محاسبه متوقف شد:</b> مجموع پرداختی‌ها و سهم‌های ثبت‌شده ${formatAmount(Math.abs(financials.balanceMismatch))} ${currency} اختلاف دارد. فاکتورها را بررسی کن؛ برای جلوگیری از پیشنهاد واریز اشتباه، انتقالی نمایش داده نشده است.</div>`
-        : '';
 
-      if (Math.abs(financials.balanceMismatch || 0) > 0) {
-        txContainer.innerHTML = balanceWarning;
-      } else if (financials.transactions.length === 0) {
+      if (financials.transactions.length === 0) {
         txContainer.innerHTML = `
           <div class="text-center py-8 px-4 rounded-2xl glass-subcard">
             <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl">
@@ -2514,13 +2606,14 @@
       } else {
         txContainer.innerHTML = financials.transactions.map(tx => {
           const bank = detectIranianBank(tx.toCard);
+          const breakdown = formatTransactionBreakdown(tx);
           return `
-            <div class="p-3.5 sm:p-4 rounded-2xl glass-subcard space-y-3 border border-white/5 hover:border-cyan-500/30 transition">
+            <div class="p-3.5 sm:p-4 rounded-2xl glass-subcard space-y-2.5 border border-white/5 hover:border-cyan-500/30 transition">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                 <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                   <span class="px-2.5 py-1 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 font-extrabold text-xs sm:text-sm">${tx.fromName}</span>
                   <span class="text-xs text-slate-400 flex items-center gap-1">
-                    <span>واریز به</span>
+                    <span>واریز کند به</span>
                     <i class="fa-solid fa-arrow-left accent-text"></i>
                   </span>
                   <span class="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-extrabold text-xs sm:text-sm">${tx.toName}</span>
@@ -2532,7 +2625,11 @@
                 </button>
               </div>
 
-              <div class="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-slate-500/15">
+              <div class="text-[11px] text-slate-400 bg-slate-950/30 px-3 py-1.5 rounded-xl leading-relaxed">
+                <i class="fa-solid fa-receipt accent-text ml-1"></i>${breakdown}
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-500/15">
                 <div class="flex flex-wrap items-center gap-1.5 min-w-0">
                   ${bank ? `<span class="text-[10px] px-2 py-0.5 rounded-md ${bank.badge} font-bold">${bank.name}</span>` : ''}
                   ${tx.toCard
@@ -2580,8 +2677,8 @@
       sortedMembers.forEach(st => { maxAbsNet = Math.max(maxAbsNet, Math.abs(st.net)); });
 
       balancesContainer.innerHTML = sortedMembers.map(st => {
-        const isCreditor = st.net > 0;
-        const isDebtor = st.net < 0;
+        const isCreditor = st.net > 10;
+        const isDebtor = st.net < -10;
         const barPct = Math.round((Math.abs(st.net) / maxAbsNet) * 100);
 
         const badgeClass = isCreditor
@@ -2988,38 +3085,54 @@
       const statusBox = document.getElementById('splitSummaryStatus');
 
       if (currentSplitMethod === 'equal') {
-        const checked = Array.from(document.querySelectorAll('.split-equal-check')).filter(c => c.checked);
-        const count = checked.length;
-        const perPerson = count > 0 ? Math.round(totalAmt / count) : 0;
+        const weights = {};
+        document.querySelectorAll('.split-equal-check').forEach(c => {
+          const mId = c.getAttribute('data-member-id');
+          if (c.checked) weights[mId] = 1;
+        });
+        const distributed = distributeExactShares(totalAmt, weights);
+        const count = Object.keys(weights).length;
+        const avg = count > 0 ? Math.round(totalAmt / count) : 0;
+
         document.querySelectorAll('.split-equal-check').forEach(c => {
           const mId = c.getAttribute('data-member-id');
           const el = document.getElementById(`memberSharePreview-${mId}`);
-          if (el) el.textContent = c.checked ? `${formatAmount(perPerson)} ${currency}` : `۰ ${currency}`;
+          if (el) el.textContent = distributed[mId] ? `${formatAmount(distributed[mId])} ${currency}` : `۰ ${currency}`;
         });
-        statusBox.innerHTML = `<span>تقسیم مساوی بین <b>${toPersianDigits(count)} نفر</b>:</span><span class="font-black">نفری ${formatAmount(perPerson)} ${currency}</span>`;
+        statusBox.innerHTML = `<span>تقسیم مساوی بین <b>${toPersianDigits(count)} نفر</b>:</span><span class="font-black">نفری ~${formatAmount(avg)} ${currency}</span>`;
       } else if (currentSplitMethod === 'weight') {
-        const inputs = Array.from(document.querySelectorAll('.split-weight-input'));
+        const weights = {};
         let totalW = 0;
-        inputs.forEach(i => totalW += Math.max(0, parseInt(i.value, 10) || 0));
-        inputs.forEach(i => {
+        document.querySelectorAll('.split-weight-input').forEach(i => {
           const mId = i.getAttribute('data-member-id');
           const w = Math.max(0, parseInt(i.value, 10) || 0);
-          const share = totalW > 0 ? Math.round((totalAmt * w) / totalW) : 0;
+          if (w > 0) {
+            weights[mId] = w;
+            totalW += w;
+          }
+        });
+        const distributed = distributeExactShares(totalAmt, weights);
+        document.querySelectorAll('.split-weight-input').forEach(i => {
+          const mId = i.getAttribute('data-member-id');
           const el = document.getElementById(`memberSharePreview-${mId}`);
-          if (el) el.textContent = `${formatAmount(share)} ${currency}`;
+          if (el) el.textContent = `${formatAmount(distributed[mId] || 0)} ${currency}`;
         });
         const perShare = totalW > 0 ? Math.round(totalAmt / totalW) : 0;
-        statusBox.innerHTML = `<span>مجموع سهام: <b>${toPersianDigits(totalW)} سهم</b></span><span class="font-black">هر سهم ${formatAmount(perShare)} ${currency}</span>`;
+        statusBox.innerHTML = `<span>مجموع سهام: <b>${toPersianDigits(totalW)} سهم</b></span><span class="font-black">هر سهم ~${formatAmount(perShare)} ${currency}</span>`;
       } else if (currentSplitMethod === 'percent') {
-        const inputs = Array.from(document.querySelectorAll('.split-percent-input'));
+        const weights = {};
         let totalPct = 0;
-        inputs.forEach(i => {
+        document.querySelectorAll('.split-percent-input').forEach(i => {
           const mId = i.getAttribute('data-member-id');
           const p = Math.max(0, parseFloat(i.value) || 0);
           totalPct += p;
-          const share = Math.round((totalAmt * p) / 100);
+          if (p > 0) weights[mId] = p;
+        });
+        const distributed = distributeExactShares(totalAmt, weights);
+        document.querySelectorAll('.split-percent-input').forEach(i => {
+          const mId = i.getAttribute('data-member-id');
           const el = document.getElementById(`memberSharePreview-${mId}`);
-          if (el) el.textContent = `${formatAmount(share)} ${currency}`;
+          if (el) el.textContent = `${formatAmount(distributed[mId] || 0)} ${currency}`;
         });
         const remPct = Math.round((100 - totalPct) * 10) / 10;
         statusBox.innerHTML = remPct === 0
@@ -3065,8 +3178,8 @@
             sumPaid += val;
           }
         });
-        if (sumPaid !== amount) {
-          showToast('در حالت چند پرداخت‌کننده، مجموع پرداختی‌ها باید دقیقاً برابر با مبلغ کل فاکتور باشد!', 'error');
+        if (Math.abs(sumPaid - amount) > 50) {
+          showToast('در حالت چند پرداخت‌کننده، مجموع پرداختی‌ها باید برابر با مبلغ کل فاکتور باشد!', 'error');
           return;
         }
         payerId = Object.keys(payers)[0] || group.members[0].id;
@@ -3074,61 +3187,55 @@
         payers[payerId] = amount;
       }
 
-      const splits = {};
+      let splits = {};
       const meta = {};
 
       if (currentSplitMethod === 'equal') {
-        const checked = Array.from(document.querySelectorAll('.split-equal-check')).filter(c => c.checked);
-        if (checked.length === 0) {
+        const weights = {};
+        document.querySelectorAll('.split-equal-check').forEach(c => {
+          if (c.checked) {
+            const mId = c.getAttribute('data-member-id');
+            weights[mId] = 1;
+            meta[mId] = 1;
+          }
+        });
+        if (Object.keys(weights).length === 0) {
           showToast('حداقل یک نفر باید در این هزینه شریک باشد.', 'error');
           return;
         }
-        const allocation = allocateExactAmount(amount, checked.map(c => ({
-          id: c.getAttribute('data-member-id'), weight: 1
-        })));
-        checked.forEach(c => {
-          const mId = c.getAttribute('data-member-id');
-          splits[mId] = allocation[mId] || 0;
-          meta[mId] = 1;
-        });
+        splits = distributeExactShares(amount, weights);
       } else if (currentSplitMethod === 'weight') {
-        const inputs = Array.from(document.querySelectorAll('.split-weight-input'));
-        let totalW = 0;
-        inputs.forEach(i => totalW += Math.max(0, parseInt(i.value, 10) || 0));
-        if (totalW <= 0) {
+        const weights = {};
+        document.querySelectorAll('.split-weight-input').forEach(i => {
+          const mId = i.getAttribute('data-member-id');
+          const w = Math.max(0, parseInt(i.value, 10) || 0);
+          if (w > 0) {
+            weights[mId] = w;
+            meta[mId] = w;
+          }
+        });
+        if (Object.keys(weights).length === 0) {
           showToast('مجموع ضرایب باید بیشتر از صفر باشد.', 'error');
           return;
         }
-        const weightedEntries = inputs.map(i => ({
-          id: i.getAttribute('data-member-id'),
-          weight: Math.max(0, parseInt(i.value, 10) || 0)
-        }));
-        const allocation = allocateExactAmount(amount, weightedEntries);
-        weightedEntries.forEach(entry => {
-          if (entry.weight > 0) {
-            splits[entry.id] = allocation[entry.id] || 0;
-            meta[entry.id] = entry.weight;
-          }
-        });
+        splits = distributeExactShares(amount, weights);
       } else if (currentSplitMethod === 'percent') {
-        const inputs = Array.from(document.querySelectorAll('.split-percent-input'));
+        const weights = {};
         let totalP = 0;
-        const weightedEntries = inputs.map(i => {
+        document.querySelectorAll('.split-percent-input').forEach(i => {
+          const mId = i.getAttribute('data-member-id');
           const p = Math.max(0, parseFloat(i.value) || 0);
           totalP += p;
-          return { id: i.getAttribute('data-member-id'), weight: p };
-        });
-        if (Math.abs(totalP - 100) > 0.01) {
-          showToast('مجموع درصدها باید دقیقاً ۱۰۰ درصد باشد!', 'error');
-          return;
-        }
-        const allocation = allocateExactAmount(amount, weightedEntries);
-        weightedEntries.forEach(entry => {
-          if (entry.weight > 0) {
-            splits[entry.id] = allocation[entry.id] || 0;
-            meta[entry.id] = entry.weight;
+          if (p > 0) {
+            weights[mId] = p;
+            meta[mId] = p;
           }
         });
+        if (Math.abs(totalP - 100) > 1) {
+          showToast('مجموع درصدها باید ۱۰۰ درصد باشد!', 'error');
+          return;
+        }
+        splits = distributeExactShares(amount, weights);
       } else if (currentSplitMethod === 'exact') {
         const inputs = Array.from(document.querySelectorAll('.split-exact-input'));
         let sumE = 0;
@@ -3140,8 +3247,8 @@
             sumE += val;
           }
         });
-        if (sumE !== amount) {
-          showToast('مجموع مبالغ دستی باید دقیقاً برابر با مبلغ کل فاکتور باشد!', 'error');
+        if (Math.abs(sumE - amount) > 100) {
+          showToast('مجموع مبالغ دستی با کل فاکتور برابر نیست!', 'error');
           return;
         }
       }
@@ -3244,7 +3351,6 @@
         ctx.strokeStyle = 'rgba(15, 23, 42, 0.7)';
         ctx.stroke();
 
-        // Draw Member Name along Slice
         ctx.save();
         ctx.translate(cx, cy);
         ctx.rotate(startAngle + sliceAngle / 2);
@@ -3256,7 +3362,6 @@
         ctx.restore();
       });
 
-      // Outer Metallic Ring
       ctx.beginPath();
       ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
       ctx.lineWidth = 6;
@@ -3651,25 +3756,26 @@
       lines.push(`👥 تعداد اعضا: ${toPersianDigits(group.members.length)} نفر (میانگین نفری ${formatAmount(Math.round(financials.totalGroupRealExpenses / (group.members.length || 1)))} ${currency})`);
       lines.push('');
 
-      lines.push(`⚖️ تراز مالی اعضا:`);
+      lines.push(`⚖️ تراز کل اعضا:`);
       Object.values(financials.memberStats).forEach(st => {
-        const status = st.net > 0
+        const status = st.net > 10
           ? `🟢 +${formatAmount(st.net)} بستانکار`
-          : st.net < 0
+          : st.net < -10
           ? `🔴 -${formatAmount(Math.abs(st.net))} بدهکار`
           : `⚪️ تسویه (۰)`;
         lines.push(`• ${st.name}: پرداختی ${formatAmount(st.realExpensesPaid)} | سهم ${formatAmount(st.realExpensesShare)} ⬅️ (${status})`);
       });
       lines.push('');
 
-      lines.push(`💸 واریزی‌های پیشنهادی (کمترین تراکنش):`);
-      if (Math.abs(financials.balanceMismatch || 0) > 0) {
-        lines.push(`⚠️ امکان پیشنهاد تسویه وجود ندارد؛ مجموع پرداختی‌ها و سهم‌ها ${formatAmount(Math.abs(financials.balanceMismatch))} ${currency} اختلاف دارد. لطفاً فاکتورها را بررسی کنید.`);
-      } else if (financials.transactions.length === 0) {
+      const modeTitle = settlementMode === 'direct' ? 'تسویه مستقیم فاکتور به فاکتور' : 'تهاتر ضربدری کمترین تراکنش';
+      lines.push(`💸 لیست واریزی‌ها (${modeTitle}):`);
+      if (financials.transactions.length === 0) {
         lines.push(`✅ تمام حساب‌ها تسویه شده است!`);
       } else {
         financials.transactions.forEach((tx, idx) => {
           lines.push(`${toPersianDigits(idx + 1)}. ${tx.fromName} ⬅️ به ${tx.toName}: مبلغ ${formatAmount(tx.amount)} ${currency}`);
+          const breakdown = formatTransactionBreakdown(tx);
+          if (breakdown) lines.push(`   🧾 (${breakdown})`);
           if (includeCards && tx.toCard) {
             const bank = detectIranianBank(tx.toCard);
             lines.push(`   💳 کارت ${tx.toName} (${bank ? bank.name : 'بانک'}): ${tx.toCard}`);
