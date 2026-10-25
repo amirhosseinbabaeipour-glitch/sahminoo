@@ -282,29 +282,6 @@
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="fixed top-4 left-1/2 -translate-x-1/2 z-[120] flex flex-col gap-2 w-[92%] max-w-md pointer-events-none no-print"></div>
 
-  <!-- Incoming Shared Group Import Banner (URL #import=...) -->
-  <div id="sharedImportBanner" class="hidden bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-slate-100 border-b border-cyan-500/40 px-3 sm:px-4 py-3 shadow-2xl z-50 relative no-print">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-      <div class="flex items-center gap-3 min-w-0">
-        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl accent-badge flex items-center justify-center shrink-0">
-          <i class="fa-solid fa-cloud-arrow-down text-base sm:text-lg"></i>
-        </div>
-        <div class="min-w-0">
-          <h4 class="font-extrabold text-xs sm:text-sm">یک گروه اشتراک‌گذاری‌شده از طرف دوستانتان دریافت شد!</h4>
-          <p id="sharedImportDesc" class="text-[11px] sm:text-xs text-slate-300 mt-0.5 truncate">آیا مایلید این گروه و تمام هزینه‌های آن را مشاهده کنید؟</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto">
-        <button onclick="confirmImportSharedGroup()" class="flex-1 sm:flex-initial px-3.5 py-2 rounded-xl btn-accent font-bold text-xs">
-          <i class="fa-solid fa-check ml-1"></i>مشاهده و افزودن گروه
-        </button>
-        <button onclick="dismissSharedImport()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
-          نادیده گرفتن
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- ========================================================= -->
   <!-- TOP FINTECH GLASS HEADER (100% Mobile Responsive)         -->
   <!-- ========================================================= -->
@@ -346,7 +323,7 @@
           <button onclick="setAccentTheme('coral')" id="swatch-coral" title="مرجانی غروب (Sunset Coral)" class="w-5 h-5 rounded-full bg-gradient-to-tr from-[#F43F5E] to-[#FB923C] transition-transform hover:scale-110 opacity-70"></button>
         </div>
 
-        <!-- Cloud Sync & Admin Auth Button (Responsive Top Header Icon + Status Badge) -->
+        <!-- Cloud Sync & Admin Auth Button -->
         <button id="sahminoCloudToggle" type="button" title="همگام‌سازی ابری و ورود مدیر" class="relative p-2 sm:px-3 sm:py-2 rounded-xl glass-subcard hover:border-cyan-500/40 transition-all flex items-center justify-center gap-1.5 shrink-0">
           <span id="sahminoCloudDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
           <i id="sahminoCloudIcon" class="fa-solid fa-cloud accent-text text-sm sm:text-base"></i>
@@ -693,17 +670,17 @@
               <div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
                 <div class="relative">
                   <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                  <input type="text" id="expenseSearchInput" oninput="renderExpensesList()" placeholder="جستجو در عنوان یا یادداشت..." class="w-full pr-9 pl-3 py-2.5 rounded-xl glass-input text-xs sm:text-sm focus:outline-none" />
+                  <input type="text" id="expenseSearchInput" oninput="renderExpensesList()" placeholder="جستجو در عنوان، سفارش یا یادداشت..." class="w-full pr-9 pl-3 py-2.5 rounded-xl glass-input text-xs sm:text-sm focus:outline-none" />
                 </div>
 
                 <select id="expenseCategoryFilter" onchange="renderExpensesList()" class="px-3 py-2.5 rounded-xl glass-input text-xs sm:text-sm font-semibold focus:outline-none">
                   <option value="all">همه دسته‌بندی‌ها</option>
                   <option value="food">🍔 غذا و رستوران</option>
+                  <option value="cafe">☕ کافه و عصرانه</option>
                   <option value="stay">🏠 اقامت و ویلا</option>
                   <option value="transport">🚗 حمل‌ونقل و بنزین</option>
                   <option value="market">🛒 سوپرمارکت و خرید</option>
                   <option value="fun">🎡 تفریح و بلیط</option>
-                  <option value="cafe">☕ کافه و عصرانه</option>
                   <option value="bills">💡 قبوض و شارژ</option>
                   <option value="settlement">💸 تسویه‌حساب مستقیم</option>
                   <option value="other">📦 سایر هزینه‌ها</option>
@@ -900,18 +877,18 @@
                   <i class="fa-solid fa-link text-lg sm:text-xl"></i>
                 </div>
                 <div>
-                  <h3 class="font-extrabold text-sm sm:text-lg">لینک اشتراک‌گذاری تحت وب با دوستان</h3>
-                  <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">از آنجا که همگام‌سازی ابری فعال است، دوستانتان با باز کردن آدرس سایت بدون نیاز به لاگین آخرین تغییرات را می‌بینند؛ همچنین می‌توانید لینک مستقیم زیر را ارسال کنید.</p>
+                  <h3 class="font-extrabold text-sm sm:text-lg">لینک کوتاه دعوت به گروه</h3>
+                  <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">با ارسال این لینک کوتاه، دوستانتان بدون هیچ سوالی مستقیماً وارد همین گروه می‌شوند و آخرین تغییرات ابری را مشاهده می‌کنند.</p>
                 </div>
               </div>
 
               <div class="p-3.5 sm:p-4 rounded-2xl glass-subcard space-y-3">
-                <label class="block text-xs font-bold">لینک اختصاصی گروه «<span id="shareGroupNameLabel" class="accent-text"></span>»:</label>
+                <label class="block text-xs font-bold">لینک کوتاه گروه «<span id="shareGroupNameLabel" class="accent-text"></span>»:</label>
                 <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                   <input type="text" id="shareableUrlInput" readonly class="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs font-mono dir-ltr text-left select-all focus:outline-none min-w-0" />
                   <button onclick="copyShareableUrl()" class="px-4 py-2.5 rounded-xl btn-accent font-bold text-xs shrink-0 flex items-center justify-center gap-1.5">
                     <i class="fa-regular fa-copy"></i>
-                    <span>کپی لینک</span>
+                    <span>کپی لینک کوتاه</span>
                   </button>
                 </div>
 
@@ -921,7 +898,7 @@
                       <!-- Populated by JS -->
                     </div>
                     <div class="text-xs space-y-1">
-                      <div class="font-extrabold">بارکد QR ورود سریع</div>
+                      <div class="font-extrabold">بارکد QR ورود مستقیم</div>
                       <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 leading-relaxed">دوستانتان با اسکن این بارکد با دوربین موبایل، مستقیماً وارد همین گروه می‌شوند.</p>
                     </div>
                   </div>
@@ -1013,7 +990,7 @@
   </nav>
 
   <!-- ========================================================= -->
-  <!-- MODAL 1: ADVANCED EXPENSE + BUILT-IN FAST CALCULATOR      -->
+  <!-- MODAL 1: ADVANCED EXPENSE + DRINK/ORDER FIELD + CALC      -->
   <!-- ========================================================= -->
   <div id="expenseModal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto no-print">
     <div class="glass-modal w-full max-w-2xl rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden animate-fade-slide max-h-[92vh] flex flex-col">
@@ -1039,22 +1016,30 @@
         <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-4">
           <div class="sm:col-span-7">
             <label class="block text-xs font-bold mb-1.5">عنوان هزینه <span class="text-rose-500">*</span></label>
-            <input type="text" id="expenseTitleInput" required placeholder="مثلاً: شام رستوران، اجاره ویلا، خرید سوپرمارکت..." class="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs sm:text-sm font-semibold focus:outline-none" />
+            <input type="text" id="expenseTitleInput" required placeholder="مثلاً: کافه لمیز، شام رستوران، خرید..." class="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs sm:text-sm font-semibold focus:outline-none" />
           </div>
 
           <div class="sm:col-span-5">
             <label class="block text-xs font-bold mb-1.5">دسته‌بندی</label>
-            <select id="expenseCategoryInput" class="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs sm:text-sm font-bold focus:outline-none">
+            <select id="expenseCategoryInput" onchange="toggleDrinkItemInput()" class="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs sm:text-sm font-bold focus:outline-none">
+              <option value="cafe">☕ کافه و عصرانه</option>
               <option value="food">🍔 غذا و رستوران</option>
               <option value="stay">🏠 اقامت و ویلا</option>
               <option value="transport">🚗 حمل‌ونقل و بنزین</option>
               <option value="market">🛒 سوپرمارکت و خرید</option>
               <option value="fun">🎡 تفریح و بلیط</option>
-              <option value="cafe">☕ کافه و عصرانه</option>
               <option value="bills">💡 قبوض و شارژ</option>
               <option value="other">📦 سایر هزینه‌ها</option>
             </select>
           </div>
+        </div>
+
+        <!-- فیلد اختصاصی نام نوشیدنی / آیتم سفارش (برای کافه و غذا) -->
+        <div id="drinkItemBox" class="hidden animate-fade-slide">
+          <label id="drinkItemLabel" class="block text-xs font-bold mb-1.5 accent-text">
+            <i class="fa-solid fa-mug-hot ml-1"></i>نام نوشیدنی‌ها / سفارش‌های کافه:
+          </label>
+          <input type="text" id="expenseDrinkInput" placeholder="مثلاً: آیس لاته، شیک نوتلا، موهیتو، کیک شکلاتی..." class="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs sm:text-sm font-semibold focus:outline-none" />
         </div>
 
         <!-- Amount Input + Built-in Fast Calculator Toggle -->
@@ -1410,7 +1395,7 @@
   </div>
 
   <!-- ========================================================= -->
-  <!-- MODAL 7: SAHMINO CLOUD SYNC & ADMIN LOGIN                 -->
+  <!-- MODAL 7: SAHMINO CLOUD SYNC & ADMIN LOGIN (LOCKED SIGNUP) -->
   <!-- ========================================================= -->
   <div id="sahminoCloudModal" dir="rtl" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto no-print">
     <div class="glass-modal w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden animate-fade-slide">
@@ -1431,7 +1416,7 @@
 
       <div class="p-5 sm:p-6 space-y-4">
         <p class="text-xs leading-relaxed text-slate-400">
-          اعضای گروه <b>بدون نیاز به ورود</b>، آخرین وضعیت دنگ‌ها و تسویه‌حساب‌ها را به صورت زنده مشاهده می‌کنند. اگر مدیر گروه هستید، برای افزودن یا تغییر اطلاعات وارد شوید:
+          اعضای گروه <b>بدون نیاز به ورود</b>، آخرین وضعیت دنگ‌ها و تسویه‌حساب‌ها را به صورت زنده مشاهده می‌کنند. فقط مدیر گروه برای افزودن یا تغییر اطلاعات می‌تواند وارد شود:
         </p>
 
         <div id="sahminoConnectedUserBox" class="hidden p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-between gap-2">
@@ -1451,20 +1436,18 @@
             <input id="sahminoAuthEmail" type="email" autocomplete="email" placeholder="you@example.com" class="w-full px-4 py-2.5 rounded-xl glass-input text-xs sm:text-sm font-mono dir-ltr text-left focus:outline-none" />
           </div>
           <div>
-            <label class="block text-xs font-bold mb-1.5">رمز عبور (حداقل ۶ کاراکتر)</label>
+            <label class="block text-xs font-bold mb-1.5">رمز عبور</label>
             <input id="sahminoAuthPassword" type="password" autocomplete="current-password" placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl glass-input text-xs sm:text-sm font-mono dir-ltr text-left focus:outline-none" />
           </div>
         </div>
 
-        <div id="sahminoAuthButtons" class="grid grid-cols-2 gap-2.5 pt-1">
-          <button id="sahminoSignIn" type="button" class="py-3 px-4 rounded-xl btn-accent font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5">
+        <!-- دکمه ساخت حساب جدید مخفی شده تا افراد متفرقه نتوانند حساب مدیر بسازند -->
+        <div id="sahminoAuthButtons" class="pt-1">
+          <button id="sahminoSignIn" type="button" class="w-full py-3 px-4 rounded-xl btn-accent font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5">
             <i class="fa-solid fa-right-to-bracket"></i>
-            <span>ورود مدیر</span>
+            <span>ورود به پنل مدیریت</span>
           </button>
-          <button id="sahminoSignUp" type="button" class="py-3 px-4 rounded-xl glass-subcard hover:border-cyan-400 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition">
-            <i class="fa-solid fa-user-plus accent-text"></i>
-            <span>ساخت حساب مدیر</span>
-          </button>
+          <button id="sahminoSignUp" type="button" class="hidden"></button>
         </div>
 
         <div id="sahminoConnectedActions" class="hidden space-y-2.5 pt-1">
@@ -1548,7 +1531,6 @@
       return IRAN_BANKS[bin] || { name: 'شبکه شتاب بانکی', badge: 'bg-slate-500/20 text-slate-300 border border-slate-500/30' };
     }
 
-    // Empty initial state: No fake demo groups! Only real cloud groups or user-created groups.
     function getEmptyInitialState() {
       return {
         activeGroupId: null,
@@ -1565,7 +1547,7 @@
     let currentSplitMethod = 'equal';
     let settlementMode = 'direct';
     let selectedAvatarColor = AVATAR_COLORS[0];
-    let pendingSharedGroup = null;
+    let pendingGroupCode = null;
 
     let wheelAngle = 0;
     let isSpinningWheel = false;
@@ -1669,7 +1651,7 @@
     }
 
     // =========================================================
-    // STATE MANAGEMENT & THEME INITIALIZATION
+    // STATE MANAGEMENT & AUTO-JOIN SHORT INVITE LINK (#g=CODE)
     // =========================================================
     function loadState() {
       try {
@@ -1762,47 +1744,35 @@
       }
     }
 
+    // ورود خودکار به گروه با لینک کوتاه (#g=CODE) یا لینک قدیمی (#import=...) بدون سوال پرسیدن
     function checkIncomingSharedUrl() {
       try {
         const hash = window.location.hash || '';
-        if (hash.startsWith('#import=')) {
+        if (hash.startsWith('#g=')) {
+          pendingGroupCode = decodeURIComponent(hash.replace('#g=', '').trim());
+          const found = appState.groups.find(g => g.inviteCode === pendingGroupCode || g.id === pendingGroupCode || g.cloudId === pendingGroupCode);
+          if (found) {
+            appState.activeGroupId = found.id;
+            saveState();
+          }
+          window.history.replaceState(null, null, window.location.pathname);
+        } else if (hash.startsWith('#import=')) {
           const encoded = hash.replace('#import=', '');
           const jsonStr = decodeURIComponent(escape(atob(encoded)));
           const importedGroup = JSON.parse(jsonStr);
           if (importedGroup && importedGroup.name && Array.isArray(importedGroup.members)) {
-            pendingSharedGroup = importedGroup;
-            const banner = document.getElementById('sharedImportBanner');
-            const desc = document.getElementById('sharedImportDesc');
-            desc.textContent = `گروه «${importedGroup.name}» با ${toPersianDigits(importedGroup.members.length)} عضو و ${toPersianDigits((importedGroup.expenses || []).length)} فاکتور آماده نمایش است.`;
-            banner.classList.remove('hidden');
+            const idx = appState.groups.findIndex(g => g.id === importedGroup.id);
+            if (idx > -1) appState.groups[idx] = importedGroup;
+            else appState.groups.unshift(importedGroup);
+            appState.activeGroupId = importedGroup.id;
+            saveState();
+            window.history.replaceState(null, null, window.location.pathname);
+            setTimeout(() => showToast(`وارد گروه «${importedGroup.name}» شدید!`), 300);
           }
         }
       } catch (e) {
         console.warn('Invalid shared URL hash', e);
       }
-    }
-
-    function confirmImportSharedGroup() {
-      if (!pendingSharedGroup) return;
-      const existingIdx = appState.groups.findIndex(g => g.id === pendingSharedGroup.id);
-      if (existingIdx > -1) {
-        appState.groups[existingIdx] = pendingSharedGroup;
-      } else {
-        appState.groups.unshift(pendingSharedGroup);
-      }
-      appState.activeGroupId = pendingSharedGroup.id;
-      saveState();
-      pendingSharedGroup = null;
-      window.history.replaceState(null, null, window.location.pathname);
-      document.getElementById('sharedImportBanner').classList.add('hidden');
-      renderAll();
-      showToast('گروه با موفقیت بارگذاری شد!');
-    }
-
-    function dismissSharedImport() {
-      pendingSharedGroup = null;
-      window.history.replaceState(null, null, window.location.pathname);
-      document.getElementById('sharedImportBanner').classList.add('hidden');
     }
 
     // =========================================================
@@ -2308,7 +2278,7 @@
     }
 
     // =========================================================
-    // RENDER TAB 2: EXPENSES LIST
+    // RENDER TAB 2: EXPENSES LIST (WITH DRINK/ORDER DISPLAY)
     // =========================================================
     function renderExpensesList() {
       const group = getActiveGroup();
@@ -2334,7 +2304,8 @@
         if (searchQ) {
           const inTitle = exp.title.toLowerCase().includes(searchQ);
           const inNote = (exp.note || '').toLowerCase().includes(searchQ);
-          if (!inTitle && !inNote) return false;
+          const inDrink = (exp.drinkItems || '').toLowerCase().includes(searchQ);
+          if (!inTitle && !inNote && !inDrink) return false;
         }
         return true;
       }).slice().reverse();
@@ -2389,6 +2360,8 @@
                   <span>•</span>
                   <span><i class="fa-regular fa-clock ml-1"></i>${exp.date || ''}</span>
                 </div>
+
+                ${exp.drinkItems ? `<div class="text-[11px] sm:text-xs bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2.5 py-1 rounded-lg inline-block font-bold break-words"><i class="fa-solid fa-mug-saucer ml-1"></i>سفارش: ${exp.drinkItems}</div>` : ''}
 
                 ${exp.note ? `<div class="text-[11px] sm:text-xs accent-badge px-2.5 py-1 rounded-lg inline-block break-words"><i class="fa-regular fa-note-sticky ml-1"></i>${exp.note}</div>` : ''}
 
@@ -2501,7 +2474,6 @@
         `).join('');
       }
 
-      // Horizontal Net Balance Bars
       const balancesContainer = document.getElementById('memberBalancesContainer');
       const sortedMembers = Object.values(financials.memberStats).sort((a, b) => b.net - a.net);
       let maxAbsNet = 1;
@@ -2613,8 +2585,22 @@
     }
 
     // =========================================================
-    // BUILT-IN FAST CALCULATOR & EXPENSE MODAL
+    // BUILT-IN FAST CALCULATOR & EXPENSE MODAL (WITH DRINK INPUT)
     // =========================================================
+    function toggleDrinkItemInput() {
+      const cat = document.getElementById('expenseCategoryInput').value;
+      const box = document.getElementById('drinkItemBox');
+      const label = document.getElementById('drinkItemLabel');
+      if (cat === 'cafe' || cat === 'food') {
+        box.classList.remove('hidden');
+        label.innerHTML = cat === 'cafe'
+          ? '<i class="fa-solid fa-mug-hot ml-1"></i>نام نوشیدنی‌ها / سفارش‌های کافه:'
+          : '<i class="fa-solid fa-utensils ml-1"></i>نام غذاها / نوشیدنی‌ها:';
+      } else {
+        box.classList.add('hidden');
+      }
+    }
+
     function toggleFastCalculator() {
       const pad = document.getElementById('fastCalculatorPad');
       pad.classList.toggle('hidden');
@@ -2720,6 +2706,8 @@
         document.getElementById('expenseIdInput').value = exp.id;
         document.getElementById('expenseTitleInput').value = exp.title;
         document.getElementById('expenseCategoryInput').value = exp.category === 'settlement' ? 'other' : exp.category;
+        document.getElementById('expenseDrinkInput').value = exp.drinkItems || '';
+        toggleDrinkItemInput();
         document.getElementById('expenseAmountInput').value = exp.amount.toLocaleString('en-US');
         document.getElementById('amountPersianWords').textContent = numberToPersianWords(exp.amount, group.currency || 'تومان');
         document.getElementById('expenseDateInput').value = exp.date || getTodayPersianDate();
@@ -2732,7 +2720,9 @@
         document.getElementById('expenseModalTitle').textContent = 'ثبت هزینه و فاکتور جدید';
         document.getElementById('expenseIdInput').value = '';
         document.getElementById('expenseTitleInput').value = '';
-        document.getElementById('expenseCategoryInput').value = 'food';
+        document.getElementById('expenseCategoryInput').value = 'cafe';
+        document.getElementById('expenseDrinkInput').value = '';
+        toggleDrinkItemInput();
         document.getElementById('expenseAmountInput').value = '';
         document.getElementById('amountPersianWords').textContent = '';
         document.getElementById('expenseDateInput').value = getTodayPersianDate();
@@ -2988,6 +2978,9 @@
       const id = document.getElementById('expenseIdInput').value;
       const title = document.getElementById('expenseTitleInput').value.trim();
       const category = document.getElementById('expenseCategoryInput').value;
+      const drinkItems = (category === 'cafe' || category === 'food')
+        ? (document.getElementById('expenseDrinkInput')?.value.trim() || '')
+        : '';
       const amount = getEffectiveTotalAmount();
       const date = document.getElementById('expenseDateInput').value.trim() || getTodayPersianDate();
       const note = document.getElementById('expenseNoteInput').value.trim();
@@ -3090,6 +3083,7 @@
         title,
         amount,
         category,
+        drinkItems,
         payerMode: currentPayerMode,
         payerId,
         payers,
@@ -3467,6 +3461,7 @@
 
       const newGrp = {
         id: 'grp_' + Date.now(),
+        inviteCode: Math.random().toString(36).slice(2, 8).toUpperCase(),
         name,
         emoji,
         currency,
@@ -3533,7 +3528,7 @@
     }
 
     // =========================================================
-    // WEB SHARING LINK, QR CODE & SOCIAL REPORT
+    // SHORT WEB SHARING LINK (#g=CODE), QR CODE & SOCIAL REPORT
     // =========================================================
     function generateShareLink() {
       const group = getActiveGroup();
@@ -3541,10 +3536,12 @@
       document.getElementById('shareGroupNameLabel').textContent = group.name;
 
       try {
-        const jsonStr = JSON.stringify(group);
-        const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+        if (!group.inviteCode) {
+          group.inviteCode = Math.random().toString(36).slice(2, 8).toUpperCase();
+        }
         const baseUrl = window.location.origin + window.location.pathname;
-        const fullUrl = `${baseUrl}#import=${encoded}`;
+        const shortCode = group.inviteCode || group.id;
+        const fullUrl = `${baseUrl}#g=${encodeURIComponent(shortCode)}`;
         document.getElementById('shareableUrlInput').value = fullUrl;
 
         const qrBox = document.getElementById('qrCodeBox');
@@ -3557,7 +3554,7 @@
 
     function copyShareableUrl() {
       const val = document.getElementById('shareableUrlInput').value;
-      copyText(val, 'لینک اشتراک‌گذاری وب کپی شد!');
+      copyText(val, 'لینک کوتاه دعوت کپی شد!');
     }
 
     function triggerNativeShare() {
@@ -3629,7 +3626,8 @@
         lines.push(`🧾 ریز فاکتورهای ثبت‌شده:`);
         group.expenses.forEach(exp => {
           if (exp.category !== 'settlement') {
-            lines.push(`▫️ ${exp.title}: ${formatAmount(exp.amount)} ${currency}`);
+            const drinkStr = exp.drinkItems ? ` [سفارش: ${exp.drinkItems}]` : '';
+            lines.push(`▫️ ${exp.title}${drinkStr}: ${formatAmount(exp.amount)} ${currency}`);
           }
         });
       }
@@ -3768,7 +3766,7 @@
   </script>
 
   <!-- ========================================================= -->
-  <!-- SUPABASE CLOUD SYNC ENGINE (PUBLIC READ + ADMIN WRITE)    -->
+  <!-- SUPABASE CLOUD SYNC ENGINE (PUBLIC READ + LOCKED ADMIN)   -->
   <!-- ========================================================= -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -3808,7 +3806,6 @@
       const roleBadge = $('accessRoleBadge');
 
       if (user) {
-        // Admin is logged in: Unlock all editing controls!
         document.body.classList.remove('guest-mode');
         if (roleBadge) roleBadge.textContent = '👑 مدیر فعال';
         if (authFields) authFields.classList.add('hidden');
@@ -3827,7 +3824,6 @@
           mobSub.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span><span class="text-emerald-400">مدیر متصل (ویرایش فعال)</span>';
         }
       } else {
-        // Guest Mode: Read-only cloud sync without login!
         document.body.classList.add('guest-mode');
         if (roleBadge) roleBadge.textContent = '👁️ مشاهده زنده';
         if (authFields) authFields.classList.remove('hidden');
@@ -3864,20 +3860,14 @@
     }
 
     async function signIn(signUp) {
+      if (signUp) return setStatus('ساخت حساب جدید غیرفعال است؛ فقط مدیر مجاز به ورود است.', '#fda4af');
       const email = $('sahminoAuthEmail').value.trim(), password = $('sahminoAuthPassword').value;
-      if (!email || !password) return setStatus('ایمیل و رمز عبور را وارد کنید.', '#fda4af');
-      if (password.length < 6) return setStatus('رمز عبور باید حداقل ۶ کاراکتر باشد.', '#fda4af');
+      if (!email || !password) return setStatus('ایمیل و رمز عبور مدیر را وارد کنید.', '#fda4af');
       try {
         initClient();
-        setStatus(signUp ? 'در حال ساخت حساب مدیر…' : 'در حال ورود به حساب مدیر…');
-        const result = signUp
-          ? await client.auth.signUp({ email, password })
-          : await client.auth.signInWithPassword({ email, password });
+        setStatus('در حال ورود به حساب مدیر…');
+        const result = await client.auth.signInWithPassword({ email, password });
         if (result.error) throw result.error;
-        if (signUp && !result.data.session) {
-          setStatus('حساب ساخته شد. ایمیل خود را تأیید کنید و سپس وارد شوید.', '#fcd34d');
-          return;
-        }
         user = result.data.user || result.data.session?.user || null;
         refreshAuthUI();
         if (user) {
@@ -3887,13 +3877,12 @@
           hideModal();
         }
       } catch (e) {
-        setStatus('خطا: ' + (e.message || 'اتصال ناموفق بود'), '#fda4af');
+        setStatus('خطا: ' + (e.message || 'اطلاعات ورود اشتباه است'), '#fda4af');
       }
     }
 
     function normalizeGroup(g) { return { ...g, cloudId: g.cloudId || null }; }
 
-    // Fetch groups from Supabase for EVERYONE (both Guests without login and Admin!)
     async function syncFromCloud() {
       if (syncing) return;
       initClient();
@@ -3922,9 +3911,19 @@
             const localOnly = (appState?.groups || []).filter(g => !g.cloudId && !DEMO_GROUP_IDS.has(g.id) && !cloudIds.has(g.cloudId));
             appState.groups = [...remote, ...localOnly];
           } else {
-            // Guests see the exact cloud groups created by the admin
             appState.groups = remote;
           }
+
+          // اگر کاربر با لینک کوتاه #g=CODE وارد شده، مستقیماً همان گروه را باز کن
+          if (typeof pendingGroupCode !== 'undefined' && pendingGroupCode) {
+            const target = appState.groups.find(g => g.inviteCode === pendingGroupCode || g.id === pendingGroupCode || g.cloudId === pendingGroupCode);
+            if (target) {
+              appState.activeGroupId = target.id;
+              showToast(`وارد گروه «${target.name}» شدید!`);
+            }
+            pendingGroupCode = null;
+          }
+
           if (!appState.groups.some(g => g.id === appState.activeGroupId)) {
             appState.activeGroupId = appState.groups[0]?.id || null;
           }
@@ -3935,7 +3934,6 @@
         }
         applyingRemote = false;
 
-        // Only push local changes if the Admin is signed in
         if (user) {
           await pushLocalGroups();
           setStatus('متصل به عنوان مدیر؛ تمام تغییرات شما در فضای ابری ذخیره می‌شوند.', '#86efac');
@@ -3945,7 +3943,7 @@
         startPolling();
       } catch (e) {
         applyingRemote = false;
-        setStatus('دریافت ابری انجام نشد: ' + (e.message || 'خطای نامشخص') + ' — مطمئن شوید Policy خواندن (SELECT) در Supabase برای public فعال است.', '#fda4af');
+        setStatus('دریافت ابری انجام نشد: ' + (e.message || 'خطای نامشخص'), '#fda4af');
       } finally {
         syncing = false;
         refreshAuthUI();
@@ -3966,7 +3964,7 @@
           const { error } = await client.from('sahmino_groups').update(payload).eq('id', g.cloudId);
           if (error) throw new Error('به‌روزرسانی گروه رد شد: ' + error.message);
         } else {
-          const invite = (g.inviteCode || Math.random().toString(36).slice(2, 10).toUpperCase());
+          const invite = (g.inviteCode || Math.random().toString(36).slice(2, 8).toUpperCase());
           const { data, error } = await client
             .from('sahmino_groups')
             .insert({ ...payload, invite_code: invite })
@@ -4010,7 +4008,6 @@
       }, 800);
     }
 
-    // Live polling works for BOTH Guests and Admin!
     let pollHandle = null;
     function startPolling() {
       if (pollHandle) clearInterval(pollHandle);
@@ -4056,7 +4053,6 @@
     $('sahminoCloudClose').addEventListener('click', hideModal);
     modal.addEventListener('click', e => { if (e.target === modal) hideModal(); });
     $('sahminoSignIn').addEventListener('click', () => signIn(false));
-    $('sahminoSignUp').addEventListener('click', () => signIn(true));
     $('sahminoSyncNow').addEventListener('click', async () => {
       try {
         await syncFromCloud();
@@ -4078,7 +4074,6 @@
       }
     });
 
-    // Automatically fetch from cloud on startup for EVERYONE (even without login!)
     window.addEventListener('DOMContentLoaded', async () => {
       try {
         await refreshUser();
