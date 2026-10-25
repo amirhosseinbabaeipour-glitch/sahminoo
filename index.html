@@ -610,7 +610,7 @@
                   </button>
                 </div>
 
-                <div id="dashboardQuickSettlement" class="space-y-2.5">
+                <div id="dashboardQuickSettlement" class="space-y-2.5 max-h-[560px] overflow-y-auto pr-1">
                   <!-- Populated by JS -->
                 </div>
               </div>
@@ -1788,6 +1788,39 @@
       return parseInt(clean, 10) || 0;
     }
 
+
+    // Allocate an integer amount proportionally while ensuring the result sums
+    // exactly to the original total (prevents rounding-created debts/credits).
+    function allocateExactAmount(totalAmount, weightedEntries) {
+      const total = Math.max(0, Math.round(Number(totalAmount) || 0));
+      const entries = weightedEntries
+        .map((entry, index) => ({
+          id: entry.id,
+          weight: Math.max(0, Number(entry.weight) || 0),
+          index
+        }))
+        .filter(entry => entry.weight > 0);
+      const weightSum = entries.reduce((sum, entry) => sum + entry.weight, 0);
+      const result = {};
+      if (!entries.length || weightSum <= 0) return result;
+
+      let allocated = 0;
+      const fractions = entries.map(entry => {
+        const exact = total * entry.weight / weightSum;
+        const base = Math.floor(exact);
+        result[entry.id] = base;
+        allocated += base;
+        return { id: entry.id, fraction: exact - base, index: entry.index };
+      });
+
+      let remainder = total - allocated;
+      fractions.sort((a, b) => (b.fraction - a.fraction) || (a.index - b.index));
+      for (let i = 0; i < remainder; i++) {
+        result[fractions[i % fractions.length].id] += 1;
+      }
+      return result;
+    }
+
     function numberToPersianWords(num, currency = 'تومان') {
       num = Math.floor(Number(num) || 0);
       if (num <= 0) return '';
@@ -2025,14 +2058,21 @@
         st.net = Math.round(st.paid - st.share);
       });
 
-      // Greedy Minimum Cash-Flow Algorithm
+      // A balanced ledger must have total net balance equal to zero.
+      // If not, do not issue potentially misleading transfer instructions.
+      const balanceMismatch = Math.round(
+        Object.values(memberStats).reduce((sum, st) => sum + st.net, 0)
+      );
+
+      // Greedy Minimum Cash-Flow Algorithm. Amounts are whole currency units,
+      // so do not discard small legitimate balances using an arbitrary threshold.
       const debtors = [];
       const creditors = [];
 
       Object.values(memberStats).forEach(st => {
-        if (st.net < -10) {
+        if (st.net < 0) {
           debtors.push({ id: st.id, name: st.name, amount: Math.abs(st.net) });
-        } else if (st.net > 10) {
+        } else if (st.net > 0) {
           creditors.push({ id: st.id, name: st.name, card: st.card, amount: st.net });
         }
       });
@@ -2043,32 +2083,35 @@
       const transactions = [];
       let i = 0, j = 0;
 
-      while (i < debtors.length && j < creditors.length) {
-        const debtor = debtors[i];
-        const creditor = creditors[j];
-        const settleAmt = Math.min(debtor.amount, creditor.amount);
+      if (balanceMismatch === 0) {
+        while (i < debtors.length && j < creditors.length) {
+          const debtor = debtors[i];
+          const creditor = creditors[j];
+          const settleAmt = Math.min(debtor.amount, creditor.amount);
 
-        if (settleAmt > 10) {
-          transactions.push({
-            fromId: debtor.id,
-            fromName: debtor.name,
-            toId: creditor.id,
-            toName: creditor.name,
-            toCard: creditor.card,
-            amount: Math.round(settleAmt)
-          });
+          if (settleAmt > 0) {
+            transactions.push({
+              fromId: debtor.id,
+              fromName: debtor.name,
+              toId: creditor.id,
+              toName: creditor.name,
+              toCard: creditor.card,
+              amount: Math.round(settleAmt)
+            });
+          }
+
+          debtor.amount -= settleAmt;
+          creditor.amount -= settleAmt;
+          if (debtor.amount <= 0) i++;
+          if (creditor.amount <= 0) j++;
         }
-
-        debtor.amount -= settleAmt;
-        creditor.amount -= settleAmt;
-        if (debtor.amount <= 10) i++;
-        if (creditor.amount <= 10) j++;
       }
 
       return {
         totalGroupRealExpenses,
         memberStats,
-        transactions
+        transactions,
+        balanceMismatch
       };
     }
 
@@ -2111,9 +2154,11 @@
 
       const txCount = financials.transactions.length;
       document.getElementById('statSettlementStatus').innerHTML =
-        txCount === 0
-          ? '<span class="text-emerald-400"><i class="fa-solid fa-circle-check ml-1"></i>تسویه کامل</span>'
-          : `<span class="text-amber-300">${toPersianDigits(txCount)} تراکنش مانده</span>`;
+        Math.abs(financials.balanceMismatch || 0) > 0
+          ? '<span class="text-rose-400"><i class="fa-solid fa-triangle-exclamation ml-1"></i>بررسی سهم‌ها</span>'
+          : txCount === 0
+            ? '<span class="text-emerald-400"><i class="fa-solid fa-circle-check ml-1"></i>تسویه کامل</span>'
+            : `<span class="text-amber-300">${toPersianDigits(txCount)} تراکنش مانده</span>`;
 
       // Sidebar Badges
       document.getElementById('sideBadgeExpenses').textContent = toPersianDigits(group.expenses.length);
@@ -2184,8 +2229,13 @@
     function renderDashboardTab(group, financials) {
       const currency = group.currency || 'تومان';
       const quickSettleEl = document.getElementById('dashboardQuickSettlement');
+      const balanceWarning = Math.abs(financials.balanceMismatch || 0) > 0
+        ? `<div class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs leading-relaxed"><b>خطای تراز حساب:</b> مجموع پرداختی‌ها و سهم‌ها ${formatAmount(Math.abs(financials.balanceMismatch))} ${currency} اختلاف دارد. تا زمان اصلاح فاکتورها و سهم‌ها، پیشنهاد تسویه نمایش داده نمی‌شود.</div>`
+        : '';
 
-      if (financials.transactions.length === 0) {
+      if (Math.abs(financials.balanceMismatch || 0) > 0) {
+        quickSettleEl.innerHTML = balanceWarning;
+      } else if (financials.transactions.length === 0) {
         quickSettleEl.innerHTML = `
           <div class="p-5 rounded-2xl glass-subcard text-center">
             <i class="fa-solid fa-circle-check text-2xl text-emerald-400 mb-1.5"></i>
@@ -2194,7 +2244,7 @@
           </div>
         `;
       } else {
-        quickSettleEl.innerHTML = financials.transactions.slice(0, 3).map(tx => {
+        quickSettleEl.innerHTML = financials.transactions.map(tx => {
           const bank = detectIranianBank(tx.toCard);
           return `
             <div class="p-3 sm:p-3.5 rounded-2xl glass-subcard flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
@@ -2291,9 +2341,9 @@
         const paidWidth = Math.round((st.realExpensesPaid / maxVal) * 100);
         const shareWidth = Math.round((st.realExpensesShare / maxVal) * 100);
         const net = st.net;
-        const netBadge = net > 10
+        const netBadge = net > 0
           ? `<span class="px-2 sm:px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-extrabold text-[11px] sm:text-xs">+${formatAmount(net)} بستانکار</span>`
-          : net < -10
+          : net < 0
           ? `<span class="px-2 sm:px-2.5 py-0.5 rounded-lg bg-rose-500/20 text-rose-400 border border-rose-500/30 font-extrabold text-[11px] sm:text-xs">-${formatAmount(Math.abs(net))} بدهکار</span>`
           : `<span class="px-2 sm:px-2.5 py-0.5 rounded-lg accent-badge font-bold text-[11px] sm:text-xs">تسویه شده</span>`;
 
@@ -2445,8 +2495,13 @@
     function renderSettlementTab(group, financials) {
       const currency = group.currency || 'تومان';
       const txContainer = document.getElementById('settlementTransactionsList');
+      const balanceWarning = Math.abs(financials.balanceMismatch || 0) > 0
+        ? `<div class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs leading-relaxed"><b>محاسبه متوقف شد:</b> مجموع پرداختی‌ها و سهم‌های ثبت‌شده ${formatAmount(Math.abs(financials.balanceMismatch))} ${currency} اختلاف دارد. فاکتورها را بررسی کن؛ برای جلوگیری از پیشنهاد واریز اشتباه، انتقالی نمایش داده نشده است.</div>`
+        : '';
 
-      if (financials.transactions.length === 0) {
+      if (Math.abs(financials.balanceMismatch || 0) > 0) {
+        txContainer.innerHTML = balanceWarning;
+      } else if (financials.transactions.length === 0) {
         txContainer.innerHTML = `
           <div class="text-center py-8 px-4 rounded-2xl glass-subcard">
             <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl">
@@ -2525,8 +2580,8 @@
       sortedMembers.forEach(st => { maxAbsNet = Math.max(maxAbsNet, Math.abs(st.net)); });
 
       balancesContainer.innerHTML = sortedMembers.map(st => {
-        const isCreditor = st.net > 10;
-        const isDebtor = st.net < -10;
+        const isCreditor = st.net > 0;
+        const isDebtor = st.net < 0;
         const barPct = Math.round((Math.abs(st.net) / maxAbsNet) * 100);
 
         const badgeClass = isCreditor
@@ -3010,8 +3065,8 @@
             sumPaid += val;
           }
         });
-        if (Math.abs(sumPaid - amount) > 50) {
-          showToast('در حالت چند پرداخت‌کننده، مجموع پرداختی‌ها باید برابر با مبلغ کل فاکتور باشد!', 'error');
+        if (sumPaid !== amount) {
+          showToast('در حالت چند پرداخت‌کننده، مجموع پرداختی‌ها باید دقیقاً برابر با مبلغ کل فاکتور باشد!', 'error');
           return;
         }
         payerId = Object.keys(payers)[0] || group.members[0].id;
@@ -3028,10 +3083,12 @@
           showToast('حداقل یک نفر باید در این هزینه شریک باشد.', 'error');
           return;
         }
-        const share = Math.round(amount / checked.length);
+        const allocation = allocateExactAmount(amount, checked.map(c => ({
+          id: c.getAttribute('data-member-id'), weight: 1
+        })));
         checked.forEach(c => {
           const mId = c.getAttribute('data-member-id');
-          splits[mId] = share;
+          splits[mId] = allocation[mId] || 0;
           meta[mId] = 1;
         });
       } else if (currentSplitMethod === 'weight') {
@@ -3042,30 +3099,36 @@
           showToast('مجموع ضرایب باید بیشتر از صفر باشد.', 'error');
           return;
         }
-        inputs.forEach(i => {
-          const mId = i.getAttribute('data-member-id');
-          const w = Math.max(0, parseInt(i.value, 10) || 0);
-          if (w > 0) {
-            splits[mId] = Math.round((amount * w) / totalW);
-            meta[mId] = w;
+        const weightedEntries = inputs.map(i => ({
+          id: i.getAttribute('data-member-id'),
+          weight: Math.max(0, parseInt(i.value, 10) || 0)
+        }));
+        const allocation = allocateExactAmount(amount, weightedEntries);
+        weightedEntries.forEach(entry => {
+          if (entry.weight > 0) {
+            splits[entry.id] = allocation[entry.id] || 0;
+            meta[entry.id] = entry.weight;
           }
         });
       } else if (currentSplitMethod === 'percent') {
         const inputs = Array.from(document.querySelectorAll('.split-percent-input'));
         let totalP = 0;
-        inputs.forEach(i => {
-          const mId = i.getAttribute('data-member-id');
+        const weightedEntries = inputs.map(i => {
           const p = Math.max(0, parseFloat(i.value) || 0);
           totalP += p;
-          if (p > 0) {
-            splits[mId] = Math.round((amount * p) / 100);
-            meta[mId] = p;
-          }
+          return { id: i.getAttribute('data-member-id'), weight: p };
         });
-        if (Math.abs(totalP - 100) > 1) {
-          showToast('مجموع درصدها باید ۱۰۰ درصد باشد!', 'error');
+        if (Math.abs(totalP - 100) > 0.01) {
+          showToast('مجموع درصدها باید دقیقاً ۱۰۰ درصد باشد!', 'error');
           return;
         }
+        const allocation = allocateExactAmount(amount, weightedEntries);
+        weightedEntries.forEach(entry => {
+          if (entry.weight > 0) {
+            splits[entry.id] = allocation[entry.id] || 0;
+            meta[entry.id] = entry.weight;
+          }
+        });
       } else if (currentSplitMethod === 'exact') {
         const inputs = Array.from(document.querySelectorAll('.split-exact-input'));
         let sumE = 0;
@@ -3077,8 +3140,8 @@
             sumE += val;
           }
         });
-        if (Math.abs(sumE - amount) > 100) {
-          showToast('مجموع مبالغ دستی با کل فاکتور برابر نیست!', 'error');
+        if (sumE !== amount) {
+          showToast('مجموع مبالغ دستی باید دقیقاً برابر با مبلغ کل فاکتور باشد!', 'error');
           return;
         }
       }
@@ -3590,9 +3653,9 @@
 
       lines.push(`⚖️ تراز مالی اعضا:`);
       Object.values(financials.memberStats).forEach(st => {
-        const status = st.net > 10
+        const status = st.net > 0
           ? `🟢 +${formatAmount(st.net)} بستانکار`
-          : st.net < -10
+          : st.net < 0
           ? `🔴 -${formatAmount(Math.abs(st.net))} بدهکار`
           : `⚪️ تسویه (۰)`;
         lines.push(`• ${st.name}: پرداختی ${formatAmount(st.realExpensesPaid)} | سهم ${formatAmount(st.realExpensesShare)} ⬅️ (${status})`);
@@ -3600,7 +3663,9 @@
       lines.push('');
 
       lines.push(`💸 واریزی‌های پیشنهادی (کمترین تراکنش):`);
-      if (financials.transactions.length === 0) {
+      if (Math.abs(financials.balanceMismatch || 0) > 0) {
+        lines.push(`⚠️ امکان پیشنهاد تسویه وجود ندارد؛ مجموع پرداختی‌ها و سهم‌ها ${formatAmount(Math.abs(financials.balanceMismatch))} ${currency} اختلاف دارد. لطفاً فاکتورها را بررسی کنید.`);
+      } else if (financials.transactions.length === 0) {
         lines.push(`✅ تمام حساب‌ها تسویه شده است!`);
       } else {
         financials.transactions.forEach((tx, idx) => {
